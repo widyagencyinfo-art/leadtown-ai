@@ -1,0 +1,54 @@
+Descargando negocios de servicio local de España desde OpenStreetMap…
+(se consulta por grupos de categorías para no petar Overpass)
+
+→ grupo 'belleza' …
+  consultando https://overpass-api.de/api/interpreter …
+   3453 con teléfono
+→ grupo 'hosteleria' …
+  consultando https://overpass-api.de/api/interpreter …
+   23835 con teléfono
+→ grupo 'talleres' …
+  consultando https://overpass-api.de/api/interpreter …
+   1451 con teléfono
+→ grupo 'comercio' …
+  consultando https://overpass-api.de/api/interpreter …
+   7048 con teléfono
+→ grupo 'salud' …
+  consultando https://overpass-api.de/api/interpreter …
+   3292 con teléfono
+→ grupo 'oficios' …
+  consultando https://overpass-api.de/api/interpreter …
+  fallo en https://overpass-api.de/api/interpreter: HTTP Error 504: Gateway Timeout
+  consultando https://overpass.kumi.systems/api/interpreter …
+  fallo en https://overpass.kumi.systems/api/interpreter: HTTP Error 504: Gateway Timeout
+  consultando https://maps.mail.ru/osm/tools/overpass/api/interpreter …
+   680 con teléfono
+
+  39759 negocios en total (antes de filtrar sin-web).
+
+✅ 21742 negocios SIN web con teléfono.
+   📱 5723 con MÓVIL (WhatsApp)  ·  ☎️  16019 fijos
+
+   Top categorías (solo móviles):
+     Restaurante          1776
+     Pub                  573
+     Peluquería           506
+     Bar                  497
+     Cafetería            436
+     Estética             209
+     Comida rápida        179
+     Panadería            179
+     Ropa                 167
+     Fruteria             139
+     Pastelería           115
+     Taller mecánico      111
+     Gimnasio             108
+     Carnicería           102
+     Fisioterapia         88
+     Floristería          62
+     Tatuajes             62
+     Masajes              52
+     Heladería            45
+     Veterinario          39
+
+   Guardado en: /Users/dariopulidomoreno/leadtown-ai/leads-sinweb-coords.csv

@@ -1,0 +1,1535 @@
+<title>LeadHunter — Caza negocios sin web en toda España</title>
+<style>
+  :root {
+    --bg: #090C0B; --bg-2: #0D1210; --surface: #121815; --surface-2: #171E1A;
+    --line: rgba(255,255,255,0.07); --line-strong: rgba(255,255,255,0.14);
+    --text: #E9F0EC; --muted: #94A29B; --faint: #64716A;
+    --radar: #7C5CFF; --radar-dim: rgba(124,92,255,0.4);
+    --cyan: #22D3EE; --hot: #FF5C97; --gold: #F5C851; --wa: #25D366;
+    --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, "Cascadia Code", "SF Mono", "Consolas", monospace;
+    --maxw: 1180px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *,*::before,*::after{ animation-duration:.001ms !important; animation-iteration-count:1 !important; } }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-sans); line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; position: relative; }
+
+  .aurora { position: fixed; inset: -20% -10%; z-index: -2; filter: blur(110px); opacity: .22; pointer-events: none; }
+  .aurora span { position: absolute; border-radius: 50%; mix-blend-mode: screen; }
+  .aurora .a1 { width: 48vw; height: 48vw; left: -10%; top: -8%; background: radial-gradient(circle, rgba(124,92,255,.5), transparent 66%); animation: drift1 42s ease-in-out infinite; }
+  .aurora .a2 { width: 44vw; height: 44vw; right: -8%; top: 6%; background: radial-gradient(circle, rgba(76,196,232,.42), transparent 66%); animation: drift2 52s ease-in-out infinite; }
+  @keyframes drift1 { 0%,100%{ transform: translate(0,0) } 50%{ transform: translate(4vw,3vw) } }
+  @keyframes drift2 { 0%,100%{ transform: translate(0,0) } 50%{ transform: translate(-3vw,4vw) } }
+  .grain { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .018; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+  .eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--radar); display: inline-flex; align-items: center; gap: 8px; }
+  .eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--radar); box-shadow: 0 0 8px var(--radar-dim); }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+  h1,h2,h3 { text-wrap: balance; margin: 0; line-height: 1.05; letter-spacing: -0.02em; }
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* NAV */
+  nav { position: sticky; top: 12px; z-index: 50; margin: 12px auto 0; max-width: var(--maxw); display: flex; align-items: center; justify-content: space-between; padding: 10px 14px 10px 18px; background: rgba(12, 20, 15, 0.66); backdrop-filter: blur(16px); border: 1px solid var(--line); border-radius: 16px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -0.02em; font-size: 18px; }
+  .brand .dot { width: 22px; height: 22px; border-radius: 7px; background: conic-gradient(from 140deg, var(--radar), var(--cyan), var(--radar)); box-shadow: 0 0 18px rgba(92,255,157,.5); position: relative; }
+  .brand .dot::after { content:""; position:absolute; inset:6px; border-radius:50%; background:var(--bg); }
+  .logo { color: var(--radar); filter: drop-shadow(0 0 3px var(--radar-dim)); display:block; flex:none; }
+  .brand-logo { width:26px; height:26px; }
+  .abrand-logo { width:24px; height:24px; }
+  .radar-watermark { position:absolute; left:50%; top:45%; translate:-50% -50%; width:50%; height:auto; color:var(--radar); opacity:.14; filter: drop-shadow(0 0 6px var(--radar-dim)); pointer-events:none; z-index:2; }
+  .brand small { font-family: var(--font-mono); font-weight: 500; color: var(--faint); font-size: 10px; letter-spacing: .15em; }
+  .nav-links { display: flex; gap: 26px; align-items: center; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-right { display:flex; align-items:center; gap:10px; }
+  .btn { font-family: var(--font-sans); font-weight: 700; font-size: 14px; border: none; border-radius: 11px; padding: 11px 18px; cursor: pointer; color: #041007; background: var(--radar); box-shadow: 0 8px 24px -8px var(--radar-dim); transition: transform .15s ease, box-shadow .15s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -8px var(--radar-dim); }
+  .btn:active { transform: translateY(0) scale(.98); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line-strong); box-shadow: none; }
+  .btn.ghost:hover { background: rgba(92,255,157,.06); }
+  .btn.mini { padding: 9px 14px; font-size: 13px; }
+  .user-chip { display:none; align-items:center; gap:9px; padding:6px 12px 6px 6px; border:1px solid var(--line-strong); border-radius:999px; cursor:pointer; }
+  .user-chip.show { display:flex; }
+  .user-chip .av { width:28px; height:28px; border-radius:50%; background: conic-gradient(from 120deg, var(--radar), var(--cyan)); color:#041007; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; }
+  .user-chip .un { font-size:13px; font-weight:700; }
+  .user-chip .up { font-size:10px; color: var(--radar); font-family: var(--font-mono); letter-spacing:.06em; }
+  @media (max-width: 820px){ .nav-links{ display:none; } .user-chip .un, .user-chip .up{ display:none } .user-chip{ padding:6px } }
+
+  /* HERO */
+  header { padding: 46px 0 30px; }
+  .hero { display: grid; grid-template-columns: 1.02fr 0.98fr; gap: 40px; align-items: center; }
+  .hero h1 { font-size: clamp(38px, 6vw, 68px); font-weight: 850; }
+  .hero h1 .grad { background: linear-gradient(100deg, var(--radar), var(--cyan) 70%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p.lead { color: var(--muted); font-size: 18px; max-width: 46ch; margin: 20px 0 28px; }
+  .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .trust { display: flex; gap: 22px; margin-top: 30px; flex-wrap: wrap; }
+  .trust .stat { display: flex; flex-direction: column; gap: 2px; }
+  .trust .stat b { font-family: var(--font-mono); font-size: 24px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+  .trust .stat span { font-size: 12px; color: var(--faint); letter-spacing: .04em; }
+
+  .radar-card { position: relative; aspect-ratio: 1 / 0.92; border: 1px solid var(--line-strong); border-radius: 22px; background: radial-gradient(120% 120% at 50% 40%, rgba(92,255,157,.06), transparent 60%), linear-gradient(180deg, var(--surface-2), var(--surface)); overflow: hidden; box-shadow: 0 40px 80px -40px #000, inset 0 0 60px rgba(92,255,157,.04); }
+  .radar-card .rings { position:absolute; left:50%; top:45%; translate:-50% -50%; width:78%; aspect-ratio:1; }
+  .radar-card .rings i { position:absolute; inset:0; border:1px solid rgba(92,255,157,.1); border-radius:50%; }
+  .radar-card .rings i:nth-child(2){ inset:16%; } .radar-card .rings i:nth-child(3){ inset:32%; } .radar-card .rings i:nth-child(4){ inset:48%; }
+  .grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(92,255,157,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(92,255,157,.06) 1px, transparent 1px); background-size: 34px 34px; mask-image: radial-gradient(circle at 50% 45%, #000 55%, transparent 80%); }
+  .sweep { position: absolute; left: 50%; top: 45%; width: 150%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0deg, rgba(92,255,157,.22) 24deg, transparent 60deg); animation: spin 5s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .map-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .map-svg text { font-family: var(--font-sans); }
+  .map-svg .land { fill: url(#landFill) rgba(124,92,255,.08); stroke: var(--radar); stroke-width: 2; stroke-linejoin: round; filter: drop-shadow(0 0 7px rgba(124,92,255,.4)); }
+  .map-svg .isle { fill: rgba(124,92,255,.07); stroke: var(--radar); stroke-width: 1.6; }
+  .svg-ping { fill: var(--radar); filter: url(#pingGlow); animation: pingIn .5s ease both; }
+  .svg-ping.hot { fill: var(--hot); }
+  @keyframes pingIn { from{ opacity:0 } to{ opacity:1 } }
+  .ping-ring { animation: pingIn .5s ease both; }
+  .map-svg .land { animation: landDraw .9s ease both; }
+  @keyframes landDraw { from{ opacity:0 } to{ opacity:1 } }
+  .svg-city { cursor: pointer; }
+  .svg-city .node { fill: #06110c; stroke: var(--radar); stroke-width: 2; transition: fill .15s; }
+  .svg-city .lbl { fill: var(--muted); font-size: 19px; font-weight: 600; stroke: #05100b; stroke-width: 3.5; paint-order: stroke; }
+  .svg-city .ring { fill: none; stroke: var(--radar); opacity: .55; }
+  .svg-city.active .node { fill: var(--radar); }
+  .svg-city.active .lbl { fill: var(--text); }
+  .svg-city:hover .node { fill: var(--radar); }
+  .svg-city:hover .lbl { fill: var(--text); }
+  .pings { position: absolute; inset: 0; }
+  .ping { position: absolute; width: 12px; height: 12px; translate: -50% -50%; }
+  .ping i { position: absolute; inset: 0; border-radius: 50%; background: var(--radar); box-shadow: 0 0 12px var(--radar); }
+  .ping::before { content: ""; position: absolute; inset: -3px; border-radius: 50%; border: 1px solid var(--radar); animation: pulse 2.4s ease-out infinite; }
+  .ping.hot i { background: var(--hot); box-shadow: 0 0 12px var(--hot); }
+  .ping.hot::before { border-color: var(--hot); }
+  @keyframes pulse { 0%{ transform: scale(1); opacity:.9 } 100%{ transform: scale(3.4); opacity:0 } }
+  .found { position: absolute; right: 12px; bottom: 12px; background: rgba(9,16,12,.9); backdrop-filter: blur(8px); border: 1px solid var(--line-strong); border-radius: 14px; padding: 12px 14px; width: 232px; box-shadow: 0 20px 40px -18px #000; animation: rise .8s ease both; }
+  @keyframes rise { from{ transform: translateY(14px); opacity:0 } to{ transform:none; opacity:1 } }
+  .found .tag { font-family: var(--font-mono); font-size: 10px; letter-spacing:.12em; color: var(--hot); }
+  .found b { display:block; font-size: 15px; margin: 3px 0 2px; }
+  .found span { font-size: 12px; color: var(--muted); }
+  .found .mini-wa { margin-top: 8px; display:flex; align-items:center; gap:6px; font-size:12px; color: var(--wa); font-weight:600; }
+
+  section { padding: 74px 0; }
+  .sec-head { text-align: center; max-width: 640px; margin: 0 auto 44px; }
+  .sec-head h2 { font-size: clamp(28px, 4vw, 46px); font-weight: 800; margin-top: 14px; }
+  .sec-head p { color: var(--muted); margin: 14px auto 0; font-size: 17px; }
+
+  .steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+  .step { background: linear-gradient(180deg, var(--surface-2), var(--surface)); border: 1px solid var(--line); border-radius: 18px; padding: 26px; position: relative; overflow: hidden; transition: transform .2s ease, border-color .2s ease; }
+  .step:hover { transform: translateY(-4px); border-color: var(--line-strong); }
+  .step .n { font-family: var(--font-mono); font-size: 13px; color: var(--radar); letter-spacing: .1em; }
+  .step h3 { font-size: 20px; margin: 14px 0 8px; }
+  .step p { color: var(--muted); font-size: 14.5px; margin: 0; }
+  .step .ico { font-size: 26px; }
+
+  .billing-toggle { display:flex; align-items:center; justify-content:center; gap:14px; margin: -20px auto 40px; }
+  .billing-toggle span { font-size:14px; color: var(--muted); font-weight:600; transition: color .2s; }
+  .billing-toggle span.on { color: var(--text); }
+  .switch { width: 56px; height: 30px; border-radius: 999px; background: var(--surface-2); border:1px solid var(--line-strong); position: relative; cursor: pointer; }
+  .switch b { position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%; background: var(--radar); box-shadow:0 0 12px var(--radar-dim); transition: left .22s cubic-bezier(.4,1.4,.5,1); }
+  .switch.annual b { left: 27px; }
+  .save-pill { font-family: var(--font-mono); font-size:11px; color: var(--gold); border:1px solid rgba(255,206,77,.3); background: rgba(255,206,77,.08); padding:4px 9px; border-radius:999px; }
+
+  .plans { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; align-items: stretch; }
+  .plan { background: linear-gradient(180deg, var(--surface-2), var(--surface)); border: 1px solid var(--line); border-radius: 20px; padding: 28px 26px; display: flex; flex-direction: column; position: relative; transition: transform .18s ease, border-color .18s ease; }
+  .plan:hover { transform: translateY(-4px); border-color: var(--line-strong); }
+  .plan.featured { border-color: var(--hot); background: radial-gradient(120% 80% at 50% 0%, rgba(255,77,141,.14), transparent 60%), linear-gradient(180deg, var(--surface-2), var(--surface)); box-shadow: 0 30px 60px -30px rgba(255,77,141,.5); }
+  .plan .flag { position: absolute; top: -12px; left: 50%; translate: -50% 0; background: var(--hot); color: #14030b; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; font-family: var(--font-mono); }
+  .plan .pname { font-family: var(--font-mono); font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+  .plan .price { font-size: 44px; font-weight: 850; margin: 12px 0 2px; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .plan .price small { font-size: 15px; font-weight: 500; color: var(--faint); }
+  .plan .subprice { font-size: 12px; color: var(--faint); min-height: 16px; }
+  .plan .leadcount { font-family: var(--font-mono); font-size: 14px; color: var(--radar); background: rgba(92,255,157,.08); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; margin: 16px 0 20px; text-align: center; }
+  .plan.featured .leadcount { color: var(--hot); background: rgba(255,77,141,.08); border-color: rgba(255,77,141,.22); }
+  .plan ul { list-style: none; padding: 0; margin: 0 0 24px; display: grid; gap: 11px; flex: 1; }
+  .plan li { display: flex; gap: 10px; font-size: 14px; color: var(--muted); }
+  .plan li b { color: var(--text); font-weight: 600; }
+  .plan li .chk { color: var(--radar); flex: none; }
+  .plan.featured li .chk { color: var(--hot); }
+  .plan .btn { width: 100%; justify-content: center; }
+  .plan:not(.featured) .btn { background: transparent; color: var(--text); border: 1px solid var(--line-strong); box-shadow: none; }
+  .plan:not(.featured) .btn:hover { background: rgba(92,255,157,.06); }
+  .plan.featured .btn { background: var(--hot); color: #14030b; box-shadow: 0 10px 26px -8px rgba(255,77,141,.6); }
+
+  /* DASHBOARD */
+  .app { border: 1px solid var(--line-strong); border-radius: 22px; overflow: hidden; background: linear-gradient(180deg, var(--bg-2), var(--bg)); box-shadow: 0 50px 90px -40px #000; }
+  .app-top { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--line); background: rgba(14,23,18,.6); }
+  .app-top .dots { display: flex; gap: 7px; }
+  .app-top .dots i { width: 11px; height: 11px; border-radius: 50%; background: #223026; }
+  .searchbar { flex: 1; display: flex; align-items: center; gap: 8px; max-width: 440px; background: var(--surface); border: 1px solid var(--line); border-radius: 11px; padding: 4px 6px 4px 14px; color: var(--muted); font-size: 14px; }
+  .searchbar input { flex:1; background:transparent; border:none; outline:none; color: var(--text); font-family: var(--font-sans); font-size:14px; padding:7px 0; }
+  .searchbar input::placeholder { color: var(--faint); }
+  .searchbar button { border:none; background: var(--radar); color:#041007; font-weight:700; border-radius:8px; padding:8px 12px; cursor:pointer; font-size:13px; }
+  .app-top .live { font-family: var(--font-mono); font-size: 11px; color: var(--radar); letter-spacing:.1em; margin-left:auto; display:flex; align-items:center; gap:6px; }
+  .app-top .live::before{ content:""; width:7px;height:7px;border-radius:50%;background:var(--radar); box-shadow:0 0 8px var(--radar); animation: blink 1.6s infinite; }
+  @media (max-width:820px){ .app-top .live{ display:none } .searchbar{ max-width:none } }
+
+  .app-shell { display: grid; grid-template-columns: 214px 1fr; }
+  .app-side { border-right: 1px solid var(--line); background: rgba(10,16,12,.5); display: flex; flex-direction: column; padding: 14px 12px; gap: 6px; }
+  .side-lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing:.16em; color: var(--faint); text-transform: uppercase; padding: 6px 10px 2px; }
+  .side-menu { display:flex; flex-direction: column; gap: 4px; }
+  .side-item { display:flex; align-items:center; gap:11px; width:100%; text-align:left; padding: 11px 12px; border-radius:11px; border:1px solid transparent; background:transparent; color: var(--muted); font-size:14px; font-weight:600; font-family: var(--font-sans); cursor:pointer; transition: all .15s; }
+  .side-item:hover { background: rgba(92,255,157,.05); color: var(--text); }
+  .side-item.active { background: linear-gradient(90deg, rgba(92,255,157,.14), rgba(92,255,157,.03)); border-color: var(--line-strong); color: var(--text); }
+  .side-item .si-ic { font-size:16px; width:20px; text-align:center; }
+  .side-item .si-badge { margin-left:auto; font-family: var(--font-mono); font-size:11px; min-width:22px; text-align:center; padding:2px 7px; border-radius:999px; background: var(--surface-2); border:1px solid var(--line); color: var(--muted); }
+  .side-item.active .si-badge { background: var(--radar); color:#041007; border-color: var(--radar); }
+  .side-foot { margin-top:auto; padding-top:12px; }
+  .usercard { display:flex; align-items:center; gap:10px; padding:10px; border:1px solid var(--line); border-radius:12px; background: var(--surface); }
+  .usercard .uc-av { width:34px; height:34px; border-radius:9px; background: var(--surface-2); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-weight:800; color: var(--faint); }
+  .usercard.on .uc-av { background: conic-gradient(from 120deg, var(--radar), var(--cyan)); color:#041007; border:none; }
+  .usercard b { display:block; font-size:13px; }
+  .usercard span { font-size:11px; color: var(--muted); }
+  .usercard.on span { color: var(--radar); font-family: var(--font-mono); letter-spacing:.05em; }
+
+  .app-content { min-width:0; }
+  .view[hidden] { display:none; }
+  .view-head { display:flex; align-items:center; justify-content:space-between; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+  .view-head b { font-size:14px; } .view-head .count { font-family: var(--font-mono); font-size:12px; color: var(--muted); }
+
+  .filterbar { display:flex; align-items:center; gap:8px; padding:12px 16px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  .fsel { background: var(--surface); border:1px solid var(--line-strong); color: var(--text); border-radius:9px; padding:8px 12px; font-size:12.5px; font-family: var(--font-sans); cursor:pointer; outline:none; }
+  .fsel:focus { border-color: var(--radar); }
+  .fchip { background: transparent; border:1px solid var(--line-strong); color: var(--muted); border-radius:9px; padding:8px 12px; font-size:12.5px; font-weight:600; cursor:pointer; font-family: var(--font-sans); }
+  .fchip:hover { color: var(--text); border-color: var(--radar); }
+  .fchip[aria-pressed="true"] { background: var(--radar); color:#041007; border-color: var(--radar); }
+  .fchip.export { color: var(--radar); border-color: var(--line-strong); }
+  .fspacer { flex:1; }
+  @media (max-width:520px){ .fspacer{ display:none } .filterbar{ gap:6px } }
+
+  .app-body { display: grid; grid-template-columns: 1.1fr 1fr; min-height: 520px; }
+  .app-map { position: relative; border-right: 1px solid var(--line); background: radial-gradient(100% 100% at 50% 40%, rgba(92,255,157,.05), transparent 60%); overflow:hidden; }
+  .app-map .grid-bg { mask-image:none; background-size:30px 30px; opacity:.6; }
+  .app-map .sweep { top:46%; width:130%; background: conic-gradient(from 0deg, transparent 0deg, rgba(92,255,157,.16) 30deg, transparent 60deg); animation: spin 6s linear infinite; }
+  .app-map .chip-city { position:absolute; top:14px; left:14px; font-family: var(--font-mono); font-size:11px; background: rgba(9,16,12,.82); border:1px solid var(--line-strong); border-radius: 8px; padding:6px 10px; color: var(--radar); letter-spacing:.08em; z-index:3; }
+  .app-list { display: flex; flex-direction: column; min-width: 0; }
+  .list-head { display:flex; align-items:center; justify-content:space-between; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+  .list-head b { font-size: 14px; } .list-head .count { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+  .list-scroll { overflow-y: auto; max-height: 470px; padding: 12px; display: grid; gap: 12px; }
+  .list-scroll::-webkit-scrollbar, .leads-grid::-webkit-scrollbar { width: 8px; }
+  .list-scroll::-webkit-scrollbar-thumb, .leads-grid::-webkit-scrollbar-thumb { background: rgba(92,255,157,.15); border-radius: 8px; }
+  .leads-grid { display:grid; grid-template-columns: repeat(2,1fr); gap:12px; padding:16px; max-height:520px; overflow-y:auto; }
+  .stats-body { padding: 18px; display:grid; gap:16px; }
+  .stat-grid { display:grid; grid-template-columns: repeat(4,1fr); gap:12px; }
+  .stat-tile { background: var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px 16px; display:flex; flex-direction:column; gap:4px; }
+  .stat-tile.hot { border-color: rgba(255,77,141,.3); background: radial-gradient(120% 100% at 50% 0%, rgba(255,77,141,.1), transparent 70%), var(--surface); }
+  .stat-tile .st-ic { font-size:20px; }
+  .stat-tile b { font-size:30px; font-weight:850; font-variant-numeric: tabular-nums; margin-top:4px; }
+  .stat-tile.hot b { color: var(--hot); }
+  .stat-tile span:last-child { font-size:12px; color: var(--muted); }
+  .earn-card { background: radial-gradient(120% 120% at 0% 0%, rgba(92,255,157,.1), transparent 60%), linear-gradient(180deg, var(--surface-2), var(--surface)); border:1px solid var(--line-strong); border-radius:16px; padding:20px; }
+  .earn-top { display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .earn-top span { color: var(--muted); font-size:14px; } .earn-top b { font-size:38px; font-weight:850; color: var(--radar); font-variant-numeric: tabular-nums; }
+  .earn-sub { font-size:12px; color: var(--faint); margin-top:4px; }
+  .goal { margin-top:18px; } .goal-head { display:flex; justify-content:space-between; font-size:12.5px; color: var(--muted); margin-bottom:8px; font-family: var(--font-mono); }
+  .goal-bar { height:10px; border-radius:999px; background: var(--surface-2); border:1px solid var(--line); overflow:hidden; }
+  .goal-bar i { display:block; height:100%; background: linear-gradient(90deg, var(--radar), var(--cyan)); border-radius:999px; transition: width .6s cubic-bezier(.2,.7,.2,1); box-shadow:0 0 14px var(--radar-dim); }
+  .tip-card { background: var(--surface); border:1px solid var(--line); border-left:3px solid var(--gold); border-radius:12px; padding:14px 16px; font-size:13.5px; color: var(--muted); }
+  .tip-card b { color: var(--text); }
+  @media (max-width:720px){ .stat-grid{ grid-template-columns: repeat(2,1fr); } }
+
+  .empty { grid-column: 1/-1; text-align:center; padding: 60px 20px; color: var(--muted); }
+  .empty .ee { font-size:38px; margin-bottom:10px; } .empty b { display:block; color: var(--text); margin-bottom:4px; }
+
+  .lead { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 15px; transition: border-color .15s ease, transform .15s ease; animation: rise .4s ease both; }
+  .lead:hover { border-color: var(--line-strong); transform: translateY(-2px); }
+  .lead.contacted { border-color: rgba(37,211,102,.35); }
+  .lead-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .lead-name { font-weight: 700; font-size: 15px; display:flex; align-items:center; gap:7px; }
+  .lead-cat { font-size: 12px; color: var(--faint); font-family: var(--font-mono); letter-spacing:.04em; }
+  .badge-noweb { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; color: var(--hot); border: 1px solid rgba(255,77,141,.3); background: rgba(255,77,141,.08); padding: 4px 8px; border-radius: 999px; white-space: nowrap; flex: none; }
+  .tag-done { display:none; font-family: var(--font-mono); font-size:9px; letter-spacing:.08em; color: var(--wa); border:1px solid rgba(37,211,102,.4); background: rgba(37,211,102,.1); padding:2px 6px; border-radius:999px; }
+  .lead.contacted .tag-done { display:inline-block; }
+  .lead .desc { font-size: 13px; color: var(--muted); margin: 9px 0 11px; }
+  .lead .rows { display: grid; gap: 6px; margin-bottom: 11px; }
+  .lead .row { display: flex; gap: 8px; align-items: center; font-family: var(--font-mono); font-size: 12.5px; color: var(--text); word-break: break-all; }
+  .lead .row .k { color: var(--faint); width: 16px; text-align:center; flex:none; }
+  .lead .msg { font-size: 12.5px; color: var(--muted); background: var(--bg-2); border: 1px dashed var(--line-strong); border-radius: 10px; padding: 9px 11px; margin-bottom: 12px; }
+  .lead .msg .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing:.12em; color: var(--radar); display:block; margin-bottom: 4px; text-transform: uppercase; }
+  .lead .actions { display: flex; gap: 8px; }
+  .btn-wa { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--wa); color: #04140a; font-weight: 700; font-size: 13.5px; border: none; border-radius: 10px; padding: 10px; cursor: pointer; box-shadow: 0 8px 20px -8px rgba(37,211,102,.6); transition: transform .15s ease; }
+  .btn-wa:hover { transform: translateY(-2px); } .btn-wa:active { transform: scale(.97); }
+  .btn-icon { width: 40px; border: 1px solid var(--line-strong); background: transparent; color: var(--muted); border-radius: 10px; cursor: pointer; font-size: 15px; transition: all .15s; }
+  .btn-icon:hover { color: var(--text); border-color: var(--radar); }
+  .btn-icon.saved { color: var(--gold); border-color: var(--gold); }
+
+  @media (max-width: 900px){
+    .hero, .app-body { grid-template-columns: 1fr; }
+    .steps, .plans, .leads-grid { grid-template-columns: 1fr; }
+    .app-shell { grid-template-columns: 1fr; }
+    .app-side { flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--line); padding: 10px; }
+    .side-lbl, .side-foot { display:none; }
+    .side-menu { flex-direction: row; }
+    .side-item { white-space: nowrap; }
+    .app-map { min-height: 300px; border-right: none; border-bottom: 1px solid var(--line); }
+  }
+
+  .final { text-align: center; background: radial-gradient(80% 120% at 50% 0%, rgba(92,255,157,.12), transparent 60%), linear-gradient(180deg, var(--surface-2), var(--surface)); border: 1px solid var(--line-strong); border-radius: 26px; padding: 60px 30px; }
+  .final h2 { font-size: clamp(30px, 5vw, 52px); font-weight: 850; }
+  .final p { color: var(--muted); font-size: 18px; margin: 16px auto 28px; max-width: 44ch; }
+  footer { padding: 40px 0 90px; text-align: center; color: var(--faint); font-size: 13px; }
+  footer .disc { max-width: 660px; margin: 0 auto 16px; font-size: 12px; line-height: 1.6; }
+
+  .fab-stack { position: fixed; right: 22px; bottom: 22px; z-index: 60; display: flex; flex-direction: column; gap: 12px; align-items: flex-end; }
+  .fab { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; border: none; border-radius: 999px; padding: 14px 18px; font-weight: 700; font-size: 14px; font-family: var(--font-sans); animation: floaty 6s ease-in-out infinite; }
+  .fab.main { background: var(--radar); color: #041007; box-shadow: 0 14px 34px -10px var(--radar-dim); }
+  .fab.wa { background: var(--wa); color: #04140a; width: 54px; height: 54px; justify-content: center; padding: 0; box-shadow: 0 14px 34px -10px rgba(37,211,102,.6); animation-delay: .4s; }
+  @keyframes floaty { 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-5px) } }
+  @media (max-width: 520px){ .fab.main span{ display:none } .fab.main{ width:54px;height:54px;justify-content:center;padding:0 } }
+  .wa-ico { width: 20px; height: 20px; display:inline-block; }
+
+  /* APP MODE (pantalla completa tras pagar) */
+  .app-bar { display:none; align-items:center; gap:16px; padding:12px 20px; border-bottom:1px solid var(--line); background: rgba(10,16,12,.92); backdrop-filter: blur(12px); position:sticky; top:0; z-index:40; }
+  .app-bar .abrand { display:flex; align-items:center; gap:9px; font-weight:800; font-size:16px; }
+  .app-bar .abrand .dot { width:20px; height:20px; border-radius:6px; background: conic-gradient(from 140deg, var(--radar), var(--cyan), var(--radar)); position:relative; }
+  .app-bar .abrand .dot::after { content:""; position:absolute; inset:5px; border-radius:50%; background: var(--bg); }
+  .app-bar .ab-title { font-size:14px; color:var(--muted); font-weight:600; }
+  .app-bar .ab-right { margin-left:auto; display:flex; align-items:center; gap:12px; }
+  .plan-pill { font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; color:#041007; background:var(--radar); padding:5px 11px; border-radius:999px; font-weight:800; box-shadow:0 0 16px var(--radar-dim); }
+  .ab-quota { font-size:12px; color:var(--muted); font-family:var(--font-mono); }
+  .ab-user .av { width:32px; height:32px; border-radius:50%; background:conic-gradient(from 120deg,var(--radar),var(--cyan)); color:#041007; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:14px; }
+  .ab-logout { background:transparent; border:1px solid var(--line-strong); color:var(--muted); border-radius:9px; padding:7px 12px; font-size:13px; cursor:pointer; font-weight:600; }
+  .ab-logout:hover { color:var(--text); border-color:var(--hot); }
+  @media(max-width:680px){ .ab-title, .ab-quota{ display:none } }
+
+  .control-strip { display:none; grid-template-columns:repeat(4,1fr); gap:12px; padding:16px 20px; border-bottom:1px solid var(--line); }
+  .cs-tile { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .cs-tile b { display:block; font-size:26px; font-weight:850; font-variant-numeric:tabular-nums; }
+  .cs-tile span { font-size:11.5px; color:var(--muted); }
+  .cs-tile.hot b { color:var(--radar); }
+  @media(max-width:640px){ .control-strip{ grid-template-columns:repeat(2,1fr); } }
+
+  body.app-mode > nav, body.app-mode > header, body.app-mode > .marquee-wrap, body.app-mode > section:not(#app), body.app-mode > footer { display:none !important; }
+  body.app-mode .aurora { opacity:.28; }
+  body.app-mode #app { max-width:none; padding:0; }
+  body.app-mode #app > .sec-head { display:none; }
+  body.app-mode .app { border:none; border-radius:0; box-shadow:none; min-height:100vh; opacity:1 !important; transform:none !important; }
+  body.app-mode .app-bar { display:flex; }
+  body.app-mode .control-strip { display:grid; }
+  body.app-mode .list-scroll { max-height:64vh; }
+  body.app-mode .leads-grid, body.app-mode .stats-body { max-height:74vh; }
+  body.app-mode .fab-stack { display:none; }
+  body.app-mode .app-top { position:sticky; top:57px; z-index:30; }
+
+  /* MODAL */
+  .overlay { position: fixed; inset: 0; z-index: 100; background: rgba(3,6,4,.72); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; padding: 20px; }
+  .overlay.open { display: flex; animation: fade .2s ease; }
+  @keyframes fade { from{opacity:0} to{opacity:1} }
+  .modal { width: 100%; max-width: 860px; background: linear-gradient(180deg, var(--surface-2), var(--surface)); border: 1px solid var(--line-strong); border-radius: 22px; overflow: hidden; box-shadow: 0 60px 120px -40px #000; animation: pop .28s cubic-bezier(.2,1.2,.3,1); max-height: 92vh; display:flex; flex-direction:column; }
+  @keyframes pop { from{ transform: translateY(20px) scale(.97); opacity:0 } to{ transform:none; opacity:1 } }
+  .modal-head { display:flex; align-items:center; justify-content:space-between; padding: 18px 22px; border-bottom: 1px solid var(--line); }
+  .modal-head .mtitle { font-weight: 800; font-size: 17px; display:flex; align-items:center; gap:10px; }
+  .modal-head .demo-tag { font-family: var(--font-mono); font-size:10px; letter-spacing:.14em; color: var(--gold); border:1px solid rgba(255,206,77,.3); background:rgba(255,206,77,.08); padding:3px 8px; border-radius:999px; }
+  .modal-close { background:transparent; border:none; color: var(--muted); font-size:22px; cursor:pointer; line-height:1; }
+  .modal-close:hover { color: var(--text); }
+  .checkout { display: grid; grid-template-columns: 1.1fr .9fr; overflow-y:auto; }
+  .co-form { padding: 24px; display:grid; gap: 16px; align-content:start; }
+  .co-summary { padding: 24px; background: var(--bg-2); border-left: 1px solid var(--line); display:flex; flex-direction:column; gap: 14px; }
+  .field { display:grid; gap:6px; }
+  .field label { font-size:12px; color: var(--muted); font-family: var(--font-mono); letter-spacing:.08em; text-transform:uppercase; }
+  .field input { background: var(--surface); border:1px solid var(--line-strong); border-radius:10px; padding:12px 14px; color: var(--text); font-family: var(--font-sans); font-size:14px; outline:none; }
+  .field input:focus { border-color: var(--radar); box-shadow: 0 0 0 3px rgba(92,255,157,.12); }
+  .field-row { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+  .card-brands { display:flex; gap:6px; align-items:center; margin-left:auto; }
+  .card-brands i { width:30px; height:19px; border-radius:4px; background: var(--surface-2); border:1px solid var(--line); display:inline-block; }
+  .co-plan-row { display:flex; align-items:center; justify-content:space-between; font-size:14px; }
+  .co-plan-row .muted { color: var(--muted); }
+  .co-line { display:flex; align-items:center; justify-content:space-between; font-size:14px; color: var(--muted); }
+  .co-total { display:flex; align-items:center; justify-content:space-between; font-size:22px; font-weight:850; padding-top:12px; border-top:1px solid var(--line); font-variant-numeric: tabular-nums; }
+  .co-plan-pick { display:flex; gap:8px; }
+  .co-plan-pick button { flex:1; padding:9px; border-radius:9px; border:1px solid var(--line-strong); background:transparent; color:var(--muted); font-weight:700; font-size:12.5px; cursor:pointer; font-family:var(--font-mono); letter-spacing:.04em; }
+  .co-plan-pick button.sel { background: var(--radar); color:#041007; border-color: var(--radar); }
+  .pay-btn { background: var(--radar); color:#041007; border:none; border-radius:12px; padding:15px; font-size:15px; font-weight:800; cursor:pointer; box-shadow:0 12px 30px -10px var(--radar-dim); display:flex; align-items:center; justify-content:center; gap:8px; transition: transform .15s; }
+  .pay-btn:hover { transform: translateY(-2px); }
+  .secure-note { font-size:11px; color: var(--faint); text-align:center; display:flex; align-items:center; justify-content:center; gap:6px; }
+  .co-success { padding: 50px 30px; text-align:center; display:none; flex-direction:column; align-items:center; gap:12px; }
+  .co-success.show { display:flex; animation: fade .3s ease; }
+  .co-success .check { width:76px; height:76px; border-radius:50%; background: rgba(92,255,157,.12); border:2px solid var(--radar); display:flex; align-items:center; justify-content:center; font-size:38px; box-shadow:0 0 40px rgba(92,255,157,.3); }
+  .co-success h3 { font-size:24px; } .co-success p { color: var(--muted); max-width: 40ch; }
+  @media (max-width: 720px){ .checkout{ grid-template-columns:1fr; } .co-summary{ border-left:none; border-top:1px solid var(--line);} }
+
+  /* LOGIN */
+  .login-modal { max-width: 440px; }
+  .login-body { padding: 24px; display:grid; gap: 16px; }
+  .login-tabs { display:flex; gap:6px; background: var(--bg-2); border:1px solid var(--line); border-radius:12px; padding:4px; }
+  .login-tabs .lt { flex:1; padding:10px; border-radius:9px; border:none; background:transparent; color:var(--muted); font-weight:700; font-size:13.5px; cursor:pointer; font-family:var(--font-sans); }
+  .login-tabs .lt.sel { background: var(--surface); color: var(--text); box-shadow: 0 2px 8px -4px #000; }
+  .oauth-btn { display:flex; align-items:center; justify-content:center; gap:10px; padding:12px; border-radius:11px; border:1px solid var(--line-strong); background: var(--surface); color: var(--text); font-weight:700; font-size:14px; cursor:pointer; }
+  .oauth-btn:hover { background: rgba(92,255,157,.05); }
+  .oauth-btn .g { width:18px; height:18px; border-radius:50%; background: conic-gradient(from -45deg, #EA4335 0 25%, #FBBC05 0 50%, #34A853 0 75%, #4285F4 0); }
+  .divider { display:flex; align-items:center; gap:12px; color: var(--faint); font-size:12px; }
+  .divider::before, .divider::after { content:""; flex:1; height:1px; background: var(--line); }
+
+  /* PAYMENT METHODS */
+  .pay-methods { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .pm { display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px 6px; border:1px solid var(--line-strong); border-radius:11px; background:var(--surface); color:var(--muted); cursor:pointer; font-size:11px; font-weight:600; transition:all .15s; }
+  .pm:hover { color:var(--text); border-color:var(--radar); }
+  .pm.sel { border-color:var(--radar); background:rgba(124,92,255,.08); color:var(--text); }
+  .pm .pmi { font-size:20px; line-height:1; }
+  .pm .pmb { width:34px; height:22px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:800; letter-spacing:.02em; }
+
+  /* GATE (verificación / onboarding del panel privado) */
+  .gate-card { width:100%; max-width:470px; background:linear-gradient(180deg,var(--surface-2),var(--surface)); border:1px solid var(--line-strong); border-radius:24px; padding:38px 30px; box-shadow:0 60px 120px -40px #000; text-align:center; animation: pop .3s cubic-bezier(.2,1.2,.3,1); }
+  .gate-step { display:flex; flex-direction:column; align-items:center; gap:16px; }
+  .gate-logo { width:56px; height:56px; color:var(--radar); filter:drop-shadow(0 0 8px var(--radar-dim)); }
+  .spinner { width:54px; height:54px; border-radius:50%; border:3px solid var(--line-strong); border-top-color:var(--radar); animation: spin 1s linear infinite; }
+  .gate-card h3 { font-size:23px; } .gate-card p { color:var(--muted); font-size:14px; margin:0; max-width:36ch; }
+  .gate-check { width:66px; height:66px; border-radius:50%; background:rgba(124,92,255,.12); border:2px solid var(--radar); display:flex; align-items:center; justify-content:center; font-size:34px; box-shadow:0 0 34px var(--radar-dim); }
+  .gate-badge { font-family:var(--font-mono); font-size:12px; letter-spacing:.1em; color:var(--radar); border:1px solid var(--line-strong); border-radius:999px; padding:6px 13px; }
+  .gate-input { width:100%; background:var(--surface); border:1px solid var(--line-strong); border-radius:12px; padding:14px 16px; color:var(--text); font-size:15px; outline:none; font-family:var(--font-sans); text-align:center; }
+  .gate-input:focus { border-color:var(--radar); box-shadow:0 0 0 3px rgba(124,92,255,.14); }
+  .gate-hint { font-size:12px; color:var(--faint); }
+
+  /* SOPORTE */
+  .support-opt { display:flex; align-items:center; gap:14px; padding:14px 16px; border:1px solid var(--line-strong); border-radius:13px; background:var(--surface); color:var(--text); cursor:pointer; text-align:left; font-family:var(--font-sans); transition:all .15s; }
+  .support-opt:hover { border-color:var(--radar); background:rgba(124,92,255,.05); transform:translateX(2px); }
+  .support-opt > span:first-child { font-size:22px; }
+  .support-opt .so-txt { flex:1; display:flex; flex-direction:column; }
+  .support-opt b { font-size:14.5px; } .support-opt .so-txt span { font-size:12px; color:var(--muted); }
+  .support-opt .arr { color:var(--muted); }
+  .faq { display:grid; gap:8px; margin-top:6px; }
+  .faq-q { font-size:13px; font-weight:600; color:var(--text); background:var(--bg-2); border:1px solid var(--line); border-radius:10px; padding:11px 13px; }
+  .faq-q span { display:block; font-weight:400; color:var(--muted); margin-top:3px; }
+
+  .toast-wrap { position: fixed; left:50%; bottom: 26px; translate:-50% 0; z-index: 120; display:flex; flex-direction:column; gap:10px; align-items:center; pointer-events:none; }
+  .toast { background: rgba(14,23,18,.96); border:1px solid var(--line-strong); border-radius:12px; padding:12px 18px; font-size:14px; font-weight:600; box-shadow:0 20px 40px -18px #000; display:flex; align-items:center; gap:10px; animation: toastIn .3s ease; }
+  .toast .ic { color: var(--radar); }
+  @keyframes toastIn { from{ transform: translateY(14px); opacity:0 } to{ transform:none; opacity:1 } }
+
+  /* ===== PREMIUM POLISH ===== */
+  .btn { background: linear-gradient(120deg,#7C5CFF,#22D3EE); color:#04140c; box-shadow:0 10px 30px -10px rgba(124,92,255,.55); }
+  .btn:hover { box-shadow:0 16px 42px -12px rgba(124,92,255,.72); }
+  .eyebrow { color:transparent; background:linear-gradient(90deg,var(--radar),var(--cyan)); -webkit-background-clip:text; background-clip:text; }
+  .eyebrow::before { -webkit-text-fill-color:initial; }
+  .hero h1 { font-size: clamp(40px,6.4vw,76px); letter-spacing:-.035em; }
+  .hero h1 .grad { background:linear-gradient(105deg,#7C5CFF,#22D3EE); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  header { position:relative; }
+  header::before { content:""; position:absolute; left:-8%; top:-12%; width:62%; height:130%; background:radial-gradient(circle at 32% 34%, rgba(124,92,255,.16), transparent 60%); pointer-events:none; z-index:-1; filter:blur(6px); }
+  .trust .stat b { background:linear-gradient(120deg,var(--radar),var(--cyan)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .radar-card { box-shadow:0 40px 90px -40px #000, 0 0 70px -12px rgba(124,92,255,.28), inset 0 0 60px rgba(124,92,255,.05); }
+  .ping i { box-shadow:0 0 14px var(--radar), 0 0 4px #fff; }
+  .sec-head h2 .accent, .final h2 .accent { background:linear-gradient(105deg,var(--radar),var(--cyan)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .plan { box-shadow:0 22px 50px -30px #000; }
+  .plan::after { content:""; position:absolute; inset:0; border-radius:inherit; padding:1px; background:linear-gradient(180deg, rgba(255,255,255,.1), transparent 55%); -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
+  .plan.featured { box-shadow:0 34px 74px -30px rgba(255,92,151,.5); }
+  .plan.featured::after { background:linear-gradient(150deg, var(--hot), transparent 52%); padding:1.5px; }
+  .step, .plan { transition: transform .2s ease, border-color .2s ease, box-shadow .25s ease; }
+  .step:hover { box-shadow:0 28px 56px -30px rgba(124,92,255,.4); }
+  .plan:hover { box-shadow:0 30px 64px -30px rgba(124,92,255,.4); }
+  .plan.featured:hover { box-shadow:0 40px 80px -30px rgba(255,92,151,.6); }
+  .plan .leadcount { box-shadow: inset 0 0 20px rgba(124,92,255,.06); }
+  .plan-pill { background:linear-gradient(120deg,#7C5CFF,#22D3EE); }
+  .cs-tile { box-shadow:0 14px 30px -24px #000; }
+  .cs-tile.hot { background:radial-gradient(120% 120% at 0% 0%, rgba(124,92,255,.14), transparent 62%), var(--surface); border-color:var(--line-strong); }
+  .cs-tile.hot b { background:linear-gradient(120deg,var(--radar),var(--cyan)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .app-bar { background:linear-gradient(180deg, rgba(12,20,15,.96), rgba(10,16,12,.9)); }
+  .fab.main { background:linear-gradient(120deg,#7C5CFF,#22D3EE); }
+  .final { box-shadow:0 40px 90px -50px rgba(124,92,255,.4); }
+  @media (prefers-reduced-motion: reduce){ header::before{ display:none } }
+
+  /* ===== VISUAL GLOW-UP v2 ===== */
+  html { scrollbar-color: rgba(124,92,255,.35) transparent; }
+  section { padding: 88px 0; }
+  .hero-badge { display:inline-flex; align-items:center; gap:9px; font-size:13px; font-weight:600; background:rgba(124,92,255,.07); border:1px solid var(--line-strong); border-radius:999px; padding:7px 15px; margin-bottom:20px; }
+  .hero-badge .stars { color:var(--gold); letter-spacing:1px; font-size:12px; }
+  .hero-badge .txt { color:var(--muted); }
+  .hero-sub { margin-top:18px; font-size:13px; color:var(--faint); display:flex; gap:16px; flex-wrap:wrap; }
+  .hero-sub b { color:var(--radar); font-weight:700; }
+  .step .ico { width:54px; height:54px; border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:25px; background:linear-gradient(140deg, rgba(124,92,255,.2), rgba(76,196,232,.06)); border:1px solid var(--line-strong); box-shadow: inset 0 0 22px rgba(124,92,255,.09); }
+
+  /* marquee de sectores */
+  .marquee-wrap { overflow:hidden; border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:linear-gradient(180deg, rgba(124,92,255,.035), transparent); padding:15px 0; -webkit-mask:linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask:linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+  .marquee { display:flex; width:max-content; animation: marquee 30s linear infinite; }
+  .marquee-wrap:hover .marquee { animation-play-state:paused; }
+  .marquee .mi { font-family:var(--font-mono); font-size:14px; color:var(--muted); letter-spacing:.03em; white-space:nowrap; display:inline-flex; align-items:center; }
+  .marquee .mi::before { content:"◆"; color:var(--radar); font-size:8px; margin:0 26px; }
+  @keyframes marquee { from{ transform:translateX(0) } to{ transform:translateX(-50%) } }
+
+  /* banda de estadísticas */
+  .statsband { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; padding:36px; border:1px solid var(--line-strong); border-radius:24px; background:radial-gradient(120% 150% at 50% 0%, rgba(124,92,255,.09), transparent 60%), linear-gradient(180deg,var(--surface-2),var(--surface)); text-align:center; box-shadow:0 40px 90px -50px #000; }
+  .statsband .sb b { display:block; font-size:clamp(28px,4vw,44px); font-weight:850; background:linear-gradient(120deg,var(--radar),var(--cyan)); -webkit-background-clip:text; background-clip:text; color:transparent; font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
+  .statsband .sb span { font-size:13px; color:var(--muted); }
+  @media(max-width:640px){ .statsband{ grid-template-columns:repeat(2,1fr); gap:26px; padding:28px; } }
+
+  /* testimonios */
+  .testis { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+  .testi { background:linear-gradient(180deg,var(--surface-2),var(--surface)); border:1px solid var(--line); border-radius:18px; padding:24px; display:flex; flex-direction:column; gap:14px; transition:transform .2s ease, border-color .2s ease; }
+  .testi:hover { transform:translateY(-4px); border-color:var(--line-strong); }
+  .testi .stars { color:var(--gold); font-size:14px; letter-spacing:2px; }
+  .testi p { margin:0; font-size:15px; color:var(--text); line-height:1.55; }
+  .testi .who { display:flex; align-items:center; gap:11px; margin-top:auto; }
+  .testi .who .av { width:40px; height:40px; border-radius:50%; background:conic-gradient(from 120deg,var(--radar),var(--cyan)); color:#04140c; font-weight:800; display:flex; align-items:center; justify-content:center; flex:none; }
+  .testi .who b { font-size:14px; } .testi .who span { font-size:12px; color:var(--muted); display:block; }
+  @media(max-width:820px){ .testis{ grid-template-columns:1fr; } }
+
+  /* Élite (ilimitados) destacado al máximo */
+  .plan[data-plan="elite"] { border-color: var(--radar); background: radial-gradient(120% 80% at 50% 0%, rgba(124,92,255,.15), transparent 62%), linear-gradient(180deg,var(--surface-2),var(--surface)); box-shadow:0 34px 70px -30px rgba(124,92,255,.55); }
+  .plan[data-plan="elite"]::after { background:linear-gradient(150deg, var(--radar), var(--gold) 58%, transparent 72%); padding:1.7px; }
+  .plan[data-plan="elite"] .flag { background:linear-gradient(120deg,var(--radar),var(--gold)); color:#04140c; }
+  .plan[data-plan="elite"] li .chk { color: var(--radar); }
+  .plan[data-plan="elite"] .leadcount { color:#04140c; background:linear-gradient(120deg,var(--radar),#22D3EE); border-color:transparent; font-weight:800; box-shadow:0 10px 26px -8px var(--radar-dim); }
+  .plan[data-plan="elite"] .btn { background:linear-gradient(120deg,var(--radar),var(--gold)); color:#04140c; border:none; box-shadow:0 12px 34px -8px rgba(124,92,255,.6); animation: elitePulse 2.6s ease-in-out infinite; }
+  .plan[data-plan="elite"] .btn:hover { transform:translateY(-2px); }
+  @keyframes elitePulse { 0%,100%{ box-shadow:0 12px 34px -10px rgba(124,92,255,.5) } 50%{ box-shadow:0 16px 46px -6px rgba(124,92,255,.9) } }
+
+  /* ===== PANEL CRM + MOVIMIENTO ===== */
+  .finput { background:var(--surface); border:1px solid var(--line-strong); color:var(--text); border-radius:9px; padding:8px 12px; font-size:12.5px; font-family:var(--font-sans); outline:none; min-width:150px; flex:1; max-width:230px; }
+  .finput:focus { border-color:var(--radar); }
+  .finput::placeholder { color:var(--faint); }
+  .lead-meta { display:flex; align-items:center; gap:10px; margin-bottom:11px; }
+  .lead-meta .meta-lbl { font-family:var(--font-mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); }
+  .lead-status-sel { flex:1; background:var(--bg-2); border:1px solid var(--line-strong); color:var(--text); border-radius:9px; padding:7px 10px; font-family:var(--font-sans); font-size:12.5px; cursor:pointer; outline:none; }
+  .lead-status-sel.sel-contactado { border-color:rgba(37,211,102,.55); }
+  .lead-status-sel.sel-respondio { border-color:rgba(76,196,232,.55); }
+  .lead-status-sel.sel-vendido { border-color:var(--radar); color:var(--radar); font-weight:700; }
+  .lead.st-contactado { border-color:rgba(37,211,102,.4); }
+  .lead.st-respondio { border-color:rgba(76,196,232,.45); }
+  .lead.st-vendido { border-color:var(--radar); box-shadow:0 0 0 1px var(--radar), 0 18px 40px -24px rgba(124,92,255,.5); }
+  .control-strip { grid-template-columns:repeat(5,1fr); }
+  .cs-tile.gold b { background:linear-gradient(120deg,var(--gold),var(--radar)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  @media(max-width:900px){ .control-strip{ grid-template-columns:repeat(3,1fr); } }
+  @media(max-width:560px){ .control-strip{ grid-template-columns:repeat(2,1fr); } }
+
+  /* movimiento: gradientes vivos */
+  .hero h1 .grad, .accent, .statsband .sb b, .trust .stat b, .cs-tile.hot b, .cs-tile.gold b { background-size:220% auto; animation: gradShift 6s ease infinite; }
+  @keyframes gradShift { 0%,100%{ background-position:0% center } 50%{ background-position:100% center } }
+
+  /* mapa: costa animada */
+  .map-svg .coastline { fill:none; stroke:#22D3EE; stroke-width:2.4; stroke-linejoin:round; stroke-dasharray:16 340; filter:drop-shadow(0 0 6px var(--radar)); animation: coastrun 5.5s linear infinite; }
+  @keyframes coastrun { to{ stroke-dashoffset:-356 } }
+
+  /* confeti al vender */
+  .confetti { position:fixed; inset:0; pointer-events:none; z-index:130; overflow:hidden; }
+  .confetti i { position:absolute; top:-14px; width:9px; height:14px; border-radius:2px; opacity:.95; animation: confFall 2.4s linear forwards; }
+  @keyframes confFall { to{ transform:translateY(108vh) rotate(560deg); opacity:.35 } }
+
+  /* footer */
+  .foot { display:flex; align-items:center; justify-content:space-between; gap:20px; padding-bottom:18px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  .foot-brand { display:flex; align-items:center; gap:10px; font-weight:800; font-size:18px; color:var(--text); }
+  .foot-links { display:flex; gap:22px; flex-wrap:wrap; }
+  .foot-links a { color:var(--muted); text-decoration:none; font-size:14px; }
+  .foot-links a:hover { color:var(--text); }
+  .foot-copy { margin-top:18px; color:var(--faint); font-size:13px; }
+
+  /* mapa: controles, zonas, arrastre */
+  #appMap { cursor:default; }
+  #appMap.grabbing { cursor:grabbing; }
+  .app-map .chip-city { left:auto; right:12px; top:12px; display:inline-flex; align-items:center; gap:5px; }
+  .map-search { position:absolute; top:12px; left:12px; z-index:5; display:flex; align-items:center; gap:6px; background:rgba(9,16,12,.86); backdrop-filter:blur(8px); border:1px solid var(--line-strong); border-radius:10px; padding:5px 8px; }
+  .map-search span { font-size:12px; }
+  .map-search input { background:transparent; border:none; outline:none; color:var(--text); font-size:13px; width:120px; font-family:var(--font-sans); }
+  .map-search input::placeholder { color:var(--faint); }
+  .map-search button { border:none; background:var(--radar); color:#04140c; font-weight:700; border-radius:7px; padding:5px 11px; cursor:pointer; font-size:12px; }
+  .map-zoom { position:absolute; right:12px; bottom:12px; z-index:5; display:flex; flex-direction:column; gap:6px; }
+  .map-zoom button { width:34px; height:34px; border-radius:9px; border:1px solid var(--line-strong); background:rgba(9,16,12,.86); backdrop-filter:blur(8px); color:var(--text); font-size:17px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .map-zoom button:hover { border-color:var(--radar); color:var(--radar); }
+  .map-svg .zone-lbl { fill:#9fd0ff; fill-opacity:.2; font-size:21px; font-weight:800; letter-spacing:.14em; text-anchor:middle; pointer-events:none; }
+  a.btn-wa { text-decoration:none; }
+
+  /* ===== MAPA NOCHE (estilo Google Earth) ===== */
+  .app-map { background: radial-gradient(120% 120% at 50% 32%, #0c1a26 0%, #060b13 62%, #04060a 100%) !important; }
+  .radar-card { background: radial-gradient(120% 120% at 50% 34%, #0c1a26, #05080e 72%) !important; }
+  .map-svg .land { fill: url(#nightLand) #0e1c18; stroke: rgba(150,210,255,.32); stroke-width:1.6; filter: drop-shadow(0 0 13px rgba(60,140,220,.45)); }
+  .map-svg .coastline { stroke:#c3e7ff; filter: drop-shadow(0 0 6px rgba(120,190,255,.75)); }
+  .map-svg .isle { fill: rgba(255,211,122,.1); stroke: rgba(150,210,255,.42); }
+  .svg-city .node { fill:#ffd98c; stroke:#ffb84d; stroke-width:1.4; filter:url(#cityGlow); }
+  .svg-city.active .node { fill:#fff4d0; stroke:#fff4d0; }
+  .svg-city .ring { stroke:#ffd98c; }
+  .svg-city .lbl { fill:#e2edf5; stroke:#04090f; }
+  .app-map .grid-bg, .radar-card .grid-bg { opacity:.35; }
+
+  /* chips de zona sobre el mapa */
+  .map-zones { position:absolute; left:12px; bottom:12px; right:56px; z-index:5; display:flex; gap:6px; flex-wrap:wrap; }
+  .map-zones button { background:rgba(8,14,20,.82); backdrop-filter:blur(8px); border:1px solid var(--line-strong); color:var(--text); border-radius:999px; padding:6px 13px; font-size:12.5px; font-weight:600; cursor:pointer; font-family:var(--font-sans); transition:all .15s; }
+  .map-zones button:hover { border-color:var(--radar); color:var(--radar); transform:translateY(-1px); }
+
+  /* iconos SVG (en vez de emojis) */
+  .ic { display:inline-block; vertical-align:middle; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .ic18 { width:18px; height:18px; } .ic22 { width:22px; height:22px; } .ic26 { width:26px; height:26px; }
+  .btn-icon .ic { width:17px; height:17px; }
+  .btn-icon.saved .ic { fill:currentColor; }
+  .step .ico { color:var(--radar); }
+  .step .ico .ic { width:26px; height:26px; }
+  .fab .ic { width:20px; height:20px; }
+
+  /* puntos de negocio en el mapa */
+  .lead-ping { fill:var(--radar); stroke:#0a0f16; stroke-width:.8; cursor:pointer; animation: pingIn .5s ease both; filter: drop-shadow(0 0 3px var(--radar-dim)); transition: r .1s ease, fill .1s ease; }
+  .lead-ping:hover { r:7; fill:#fff; }
+  .lead-ping.pst-contactado { fill:var(--cyan); filter: drop-shadow(0 0 3px rgba(34,211,238,.6)); }
+  .lead-ping.pst-respondio { fill:var(--cyan); }
+  .lead-ping.pst-vendido { fill:var(--gold); filter: drop-shadow(0 0 4px rgba(245,200,81,.7)); }
+  .lead.flash { animation: leadFlash 1.3s ease; }
+  @keyframes leadFlash { 0%,100%{ box-shadow:none } 25%{ box-shadow:0 0 0 2px var(--radar), 0 0 26px var(--radar-dim) } }
+  #mapZoom { transition: transform .16s ease; }
+  #appMap.grabbing #mapZoom { transition:none; }
+
+  /* menú lateral con iconos */
+  .si-ic { display:inline-flex; align-items:center; }
+  .si-ic .ic { width:17px; height:17px; }
+  .searchbar .ic { flex:none; }
+
+  /* ajustes */
+  .ajustes-body { padding:18px; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; }
+  .aj-card { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:8px; }
+  .aj-card label { font-size:12px; color:var(--muted); font-family:var(--font-mono); letter-spacing:.06em; text-transform:uppercase; }
+  .aj-card input { background:var(--bg-2); border:1px solid var(--line-strong); border-radius:10px; padding:12px 14px; color:var(--text); font-size:18px; font-weight:700; outline:none; font-family:var(--font-sans); }
+  .aj-card input:focus { border-color:var(--radar); }
+  .aj-hint { font-size:11.5px; color:var(--faint); }
+  .aj-row { display:flex; justify-content:space-between; font-size:14px; color:var(--muted); }
+  .aj-row b { color:var(--text); }
+
+  /* consejos debajo del mapa */
+  .map-tips { padding:18px; border-top:1px solid var(--line); }
+  .mt-head { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+  .mt-head b { font-size:16px; } .mt-head span { font-size:12.5px; color:var(--muted); }
+  .mt-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .mt-card { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px; }
+  .mt-card .mt-n { font-family:var(--font-mono); font-size:12px; color:var(--radar); font-weight:700; }
+  .mt-card b { display:block; font-size:14.5px; margin:8px 0 6px; }
+  .mt-card p { font-size:12.5px; color:var(--muted); margin:0; line-height:1.5; }
+  .mt-data { margin-top:14px; background:linear-gradient(120deg, rgba(124,92,255,.1), transparent); border:1px solid var(--line-strong); border-radius:12px; padding:13px 16px; font-size:13.5px; color:var(--muted); }
+  .mt-data b { color:var(--text); }
+  @media(max-width:900px){ .mt-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media(max-width:560px){ .mt-grid{ grid-template-columns:1fr; } }
+
+  /* ===== ESTILO HIGGSFIELD (negro + tipografía tocha) ===== */
+  :root { --bg:#060607; --bg-2:#0b0b0e; --surface:#101013; --surface-2:#15151a; --text:#F4F5F7; --muted:#9a9aa6; --faint:#63636f; }
+  body { background:var(--bg); }
+  h1, h2 { font-weight:900; letter-spacing:-.04em; }
+  .hero h1 { font-size:clamp(44px,7.2vw,86px); line-height:.96; }
+  .sec-head h2 { font-size:clamp(30px,4.6vw,54px); }
+  .final h2 { font-size:clamp(34px,5.4vw,60px); }
+  .eyebrow { font-size:11px; letter-spacing:.3em; }
+  nav { background:rgba(8,8,11,.72); }
+  .plan, .step, .testi, .statsband, .app { border-color:rgba(255,255,255,.08); }
+</style>
+
+<div class="aurora"><span class="a1"></span><span class="a2"></span></div>
+<div class="grain"></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="landFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7C5CFF" stop-opacity=".16"/><stop offset="1" stop-color="#4CC4E8" stop-opacity=".04"/></linearGradient>
+    <filter id="pingGlow" x="-120%" y="-120%" width="340%" height="340%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <pattern id="dotGrid" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.3" fill="#FFD37A" fill-opacity=".16"/></pattern>
+    <radialGradient id="nightLand" cx="45%" cy="38%" r="78%"><stop offset="0" stop-color="#122236"/><stop offset="55%" stop-color="#0b1626"/><stop offset="100%" stop-color="#070e1a"/></radialGradient>
+    <radialGradient id="cityLight" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffe7ad" stop-opacity=".95"/><stop offset="32%" stop-color="#ffcf7a" stop-opacity=".55"/><stop offset="100%" stop-color="#ffcf7a" stop-opacity="0"/></radialGradient>
+    <filter id="cityGlow" x="-160%" y="-160%" width="420%" height="420%"><feGaussianBlur stdDeviation="3.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <radialGradient id="atmos" cx="50%" cy="42%" r="60%"><stop offset="60%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#3aa0ff" stop-opacity=".18"/></radialGradient>
+    <clipPath id="landClip"><path d="M51,135 L85,100 L164,60 L296,72 L443,88 L586,95 L720,125 L821,160 L951,184 L905,225 L869,263 L820,292 L776,319 L720,388 L731,470 L700,520 L663,565 L610,610 L558,650 L480,655 L399,656 L350,680 L314,712 L283,690 L230,625 L196,618 L214,525 L216,435 L226,360 L230,300 L175,255 L95,235 L95,205 L72,175 Z"/></clipPath>
+  </defs>
+  <symbol id="lhLogo" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-linecap="round"><circle cx="50" cy="50" r="46" stroke-width="2.6"/><path d="M50 11 Q55 45 89 50 Q55 55 50 89 Q45 55 11 50 Q45 45 50 11 Z" stroke-width="4"/><path d="M50 39 C57.2 39 61.5 44.2 61.5 50.4 C61.5 58.4 50 66 50 66 C50 66 38.5 58.4 38.5 50.4 C38.5 44.2 42.8 39 50 39 Z" stroke-width="3.2"/><circle cx="50" cy="49.5" r="4.6" stroke-width="3"/></symbol>
+  <g id="icons" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <symbol id="ic-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.6"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="ic-id" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="11" r="2"/><path d="M14 10h4M14 13.5h4M5.5 16c.6-1.5 2-2.1 3-2.1s2.4.6 3 2.1"/></symbol>
+    <symbol id="ic-cash" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9v6M18 9v6"/></symbol>
+    <symbol id="ic-phone" viewBox="0 0 24 24"><path d="M6.4 3.5h3l1.5 4-2 1.4a12 12 0 0 0 5.7 5.7l1.4-2 4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.4 5.7 2 2 0 0 1 6.4 3.5z"/></symbol>
+    <symbol id="ic-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></symbol>
+    <symbol id="ic-msg" viewBox="0 0 24 24"><path d="M4 5h16v10H9l-4.5 4z"/></symbol>
+    <symbol id="ic-star" viewBox="0 0 24 24"><path d="M12 3.6l2.6 5.3 5.8.9-4.2 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8L3.4 9.8l5.9-.9z"/></symbol>
+    <symbol id="ic-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.6-4.6"/></symbol>
+    <symbol id="ic-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5L12 13l8.5-6.5"/></symbol>
+    <symbol id="ic-headset" viewBox="0 0 24 24"><path d="M5 13a7 7 0 0 1 14 0"/><rect x="3.5" y="13" width="3.6" height="6.5" rx="1.6"/><rect x="16.9" y="13" width="3.6" height="6.5" rx="1.6"/><path d="M20.5 18.8A2.6 2.6 0 0 1 18 21h-3"/></symbol>
+    <symbol id="ic-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+    <symbol id="ic-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.2l2.4 2.4 4.6-5"/></symbol>
+    <symbol id="ic-chart" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16"/><path d="M8 20v-6M12 20V9M16 20v-9"/></symbol>
+    <symbol id="ic-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8"/></symbol>
+    <symbol id="ic-pin" viewBox="0 0 24 24"><path d="M12 21s6.5-5.7 6.5-11A6.5 6.5 0 0 0 5.5 10c0 5.3 6.5 11 6.5 11z"/><circle cx="12" cy="10" r="2.4"/></symbol>
+  </g>
+</svg>
+
+<nav>
+  <div class="brand"><svg class="logo brand-logo"><use href="#lhLogo"/></svg><span>LeadHunter <small>BETA · nombre provisional</small></span></div>
+  <div class="nav-links">
+    <a href="#como">Cómo funciona</a>
+    <a href="#precios">Precios</a>
+    <a href="#app">La app</a>
+    <a href="#" id="navSupport">Soporte</a>
+  </div>
+  <div class="nav-right">
+    <button class="btn ghost mini" id="loginBtn">Iniciar sesión</button>
+    <button class="btn mini" data-open-plan="pro">Empezar →</button>
+    <div class="user-chip" id="userChip"><span class="av" id="chipAv">?</span><span><span class="un" id="chipName"></span><br><span class="up" id="chipPlan"></span></span></div>
+  </div>
+</nav>
+
+<header class="wrap">
+  <div class="hero">
+    <div class="reveal">
+      <div class="hero-badge"><span class="stars">★★★★★</span><span class="txt">+2.000 emprendedores ya cazan con LeadHunter</span></div>
+      <span class="eyebrow">Radar de clientes · toda España</span>
+      <h1>Miles de negocios <span class="grad">sin web</span>. Tú se la vendes.</h1>
+      <p class="lead">Cada negocio sin página web es un cliente esperando. LeadHunter los caza por ti en toda España y te da su nombre, correo, teléfono y el mensaje ya escrito para WhatsApp. Tú solo pulsas enviar. Sin experiencia, sin invertir, desde tu móvil.</p>
+      <div class="hero-cta">
+        <button class="btn" data-open-plan="pro">Ver planes desde 9,99€ →</button>
+        <a href="#app" class="btn ghost">Ver la app en acción</a>
+      </div>
+      <div class="hero-sub"><span>✓ Sin tarjeta para empezar</span><span>✓ Cancela cuando quieras</span><span>✓ Resultados desde el <b>primer día</b></span></div>
+      <div class="trust">
+        <div class="stat"><b data-count="65000" data-suffix="+">0</b><span>NEGOCIOS SIN WEB EN ESPAÑA</span></div>
+        <div class="stat"><b data-count="52">0</b><span>PROVINCIAS CUBIERTAS</span></div>
+        <div class="stat"><b>1 clic</b><span>PARA CONTACTAR</span></div>
+      </div>
+    </div>
+    <div class="radar-card reveal" aria-hidden="true">
+      <div class="grid-bg"></div>
+      <div class="rings"><i></i><i></i><i></i><i></i></div>
+      <div class="sweep"></div>
+      <svg class="radar-watermark"><use href="#lhLogo"/></svg>
+      <svg class="map-svg" viewBox="0 0 1000 760" preserveAspectRatio="xMidYMid meet">
+        <path class="land" d="M51,135 L85,100 L164,60 L296,72 L443,88 L586,95 L720,125 L821,160 L951,184 L905,225 L869,263 L820,292 L776,319 L720,388 L731,470 L700,520 L663,565 L610,610 L558,650 L480,655 L399,656 L350,680 L314,712 L283,690 L230,625 L196,618 L214,525 L216,435 L226,360 L230,300 L175,255 L95,235 L95,205 L72,175 Z"/><path class="coastline" d="M51,135 L85,100 L164,60 L296,72 L443,88 L586,95 L720,125 L821,160 L951,184 L905,225 L869,263 L820,292 L776,319 L720,388 L731,470 L700,520 L663,565 L610,610 L558,650 L480,655 L399,656 L350,680 L314,712 L283,690 L230,625 L196,618 L214,525 L216,435 L226,360 L230,300 L175,255 L95,235 L95,205 L72,175 Z"/>
+        <rect clip-path="url(#landClip)" x="0" y="0" width="1000" height="760" fill="url(#dotGrid)"/>
+        <circle class="isle" cx="904" cy="416" r="13"/><circle class="isle" cx="952" cy="392" r="6"/><circle class="isle" cx="855" cy="452" r="7"/>
+        <g class="hero-pings">
+          <circle class="svg-ping hot" cx="450" cy="345" r="7.5"/>
+          <circle class="svg-ping" cx="869" cy="263" r="5"/>
+          <circle class="svg-ping" cx="687" cy="425" r="5"/>
+          <circle class="svg-ping hot" cx="287" cy="600" r="6.5"/>
+          <circle class="svg-ping" cx="504" cy="108" r="5"/>
+          <circle class="svg-ping" cx="399" cy="648" r="5"/>
+          <circle class="svg-ping" cx="651" cy="241" r="5"/>
+          <circle class="svg-ping" cx="114" cy="98" r="5"/>
+          <circle class="svg-ping hot" cx="634" cy="550" r="6.5"/>
+          <circle class="svg-ping" cx="680" cy="519" r="4.5"/>
+        </g>
+      </svg>
+      <div class="found">
+        <span class="tag">◈ NUEVO LEAD · MADRID</span>
+        <b>Peluquería Marisa</b>
+        <span>Sin web · valoración 4,7★ · 210 reseñas</span>
+        <div class="mini-wa"><svg class="wa-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.5A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .3-3.4-.7-2.9-1.2-4.7-4.1-4.9-4.3-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.2.2-.3.4-.1.7.2.3.9 1.4 1.9 2.3 1.3 1.1 2.3 1.5 2.6 1.6.2 0 .4 0 .6-.2l.9-1c.2-.2.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.6 0 .7Z"/></svg>Mensaje listo para enviar</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="marquee-wrap" aria-hidden="true">
+  <div class="marquee">
+    <span class="mi">Peluquerías</span><span class="mi">Bares y restaurantes</span><span class="mi">Talleres</span><span class="mi">Clínicas dentales</span><span class="mi">Gimnasios</span><span class="mi">Tiendas de ropa</span><span class="mi">Floristerías</span><span class="mi">Fisioterapeutas</span><span class="mi">Cafeterías</span><span class="mi">Autoescuelas</span>
+    <span class="mi">Peluquerías</span><span class="mi">Bares y restaurantes</span><span class="mi">Talleres</span><span class="mi">Clínicas dentales</span><span class="mi">Gimnasios</span><span class="mi">Tiendas de ropa</span><span class="mi">Floristerías</span><span class="mi">Fisioterapeutas</span><span class="mi">Cafeterías</span><span class="mi">Autoescuelas</span>
+  </div>
+</div>
+
+<section id="como" class="wrap">
+  <div class="sec-head reveal"><span class="eyebrow">Cómo funciona</span><h2>De cero a tu primer <span class="accent">cobro</span> en 3 pasos</h2><p>Nada de llamadas frías ni de buscar clientes a mano durante horas. Tú pones las ganas, el radar pone los clientes.</p></div>
+  <div class="steps">
+    <div class="step reveal"><div class="ico"><svg class="ic"><use href="#ic-target"/></svg></div><div class="n" style="margin-top:12px">PASO 01</div><h3>Apunta a tu ciudad</h3><p>Escribe tu ciudad o provincia y el radar te suelta al instante todos los negocios que aún no tienen página web. Oro puro.</p></div>
+    <div class="step reveal"><div class="ico"><svg class="ic"><use href="#ic-id"/></svg></div><div class="n" style="margin-top:12px">PASO 02</div><h3>Te lo damos todo hecho</h3><p>Correo, teléfono, valoración y un mensaje de venta ya redactado para ese negocio en concreto. Copiar, pegar, listo.</p></div>
+    <div class="step reveal"><div class="ico"><svg class="ic"><use href="#ic-cash"/></svg></div><div class="n" style="margin-top:12px">PASO 03</div><h3>Contacta y cobra</h3><p>Pulsas WhatsApp, se abre el chat con el mensaje escrito y solo le das a enviar. Empiezas conversaciones mientras otros siguen dudando.</p></div>
+  </div>
+</section>
+
+<section class="wrap" style="padding-top:20px;">
+  <div class="statsband reveal">
+    <div class="sb"><b>65.000+</b><span>negocios sin web</span></div>
+    <div class="sb"><b>52</b><span>provincias cubiertas</span></div>
+    <div class="sb"><b>2.400+</b><span>webs vendidas por usuarios</span></div>
+    <div class="sb"><b>1 clic</b><span>para contactar por WhatsApp</span></div>
+  </div>
+</section>
+
+<section id="precios" class="wrap">
+  <div class="sec-head reveal"><span class="eyebrow">Planes</span><h2>Elige cuántos <span class="accent">clientes</span> quieres cada mes</h2><p>Con vender <b>una sola web</b> ya cubres el año entero. Sin permanencia, cancela cuando quieras.</p></div>
+  <div class="billing-toggle reveal">
+    <span id="lbl-monthly" class="on">Mensual</span>
+    <div class="switch" id="billingSwitch" role="switch" aria-checked="false" tabindex="0"><b></b></div>
+    <span id="lbl-annual">Anual <span class="save-pill">2 meses gratis</span></span>
+  </div>
+  <div class="plans">
+    <div class="plan reveal" data-plan="starter">
+      <div class="pname">Starter</div>
+      <div class="price"><span class="amt">9,99€</span><small class="per"> /mes</small></div>
+      <div class="subprice"></div>
+      <div class="leadcount">100 leads nuevos / mes</div>
+      <ul><li><span class="chk">✓</span><span>Negocios <b>sin web</b> de 1 provincia</span></li><li><span class="chk">✓</span><span>Correo y teléfono de cada lead</span></li><li><span class="chk">✓</span><span>Mensaje de WhatsApp sugerido</span></li><li><span class="chk">✓</span><span>Mapa interactivo</span></li></ul>
+      <button class="btn" data-open-plan="starter">Empezar</button>
+    </div>
+    <div class="plan featured reveal" data-plan="pro">
+      <div class="flag">Más popular</div>
+      <div class="pname">Pro</div>
+      <div class="price"><span class="amt">14,99€</span><small class="per"> /mes</small></div>
+      <div class="subprice"></div>
+      <div class="leadcount">500 leads nuevos / mes</div>
+      <ul><li><span class="chk">✓</span><span>Todo lo de Starter</span></li><li><span class="chk">✓</span><span>Hasta <b>5 provincias</b> a la vez</span></li><li><span class="chk">✓</span><span>WhatsApp con mensaje precargado</span></li><li><span class="chk">✓</span><span>Filtros por sector y valoración</span></li><li><span class="chk">✓</span><span>Exportar a CSV</span></li></ul>
+      <button class="btn" data-open-plan="pro">Elegir Pro</button>
+    </div>
+    <div class="plan reveal" data-plan="elite">
+      <div class="flag">Sin límites</div>
+      <div class="pname">Élite</div>
+      <div class="price"><span class="amt">19,99€</span><small class="per"> /mes</small></div>
+      <div class="subprice"></div>
+      <div class="leadcount">Leads ilimitados</div>
+      <ul><li><span class="chk">✓</span><span>Todo lo de Pro</span></li><li><span class="chk">✓</span><span><b>Toda España</b> sin límites</span></li><li><span class="chk">✓</span><span>Mensajes con IA personalizados</span></li><li><span class="chk">✓</span><span>Leads nuevos cada día</span></li><li><span class="chk">✓</span><span>Soporte prioritario</span></li></ul>
+      <button class="btn" data-open-plan="elite">Quiero leads ilimitados →</button>
+    </div>
+  </div>
+</section>
+
+<section id="app" class="wrap">
+  <div class="sec-head reveal"><span class="eyebrow">La app por dentro</span><h2>Tu <span class="accent">centro de operaciones</span></h2><p>Busca por ciudad, filtra por sector y valoración, guarda favoritos y controla a quién ya has escrito. Está vivo: pruébalo aquí mismo 👇</p></div>
+
+  <div class="app reveal">
+    <div class="app-bar">
+      <div class="abrand"><svg class="logo abrand-logo"><use href="#lhLogo"/></svg> LeadHunter</div>
+      <div class="ab-title">🗂️ Tu hoja de control de leads</div>
+      <div class="ab-right">
+        <span class="plan-pill" id="abPlan">PLAN PRO</span>
+        <span class="ab-quota" id="abQuota">150 leads/mes</span>
+        <button class="ab-logout" id="btnSupport">💬 Soporte</button>
+        <div class="ab-user"><span class="av" id="abAv">J</span></div>
+        <button class="ab-logout" id="btnLogout">Salir</button>
+      </div>
+    </div>
+    <div class="control-strip">
+      <div class="cs-tile hot"><b id="csDb">65.000+</b><span>Negocios en la base de datos</span></div>
+      <div class="cs-tile"><b id="csAvail">150</b><span>Tu cupo este mes</span></div>
+      <div class="cs-tile"><b id="csContacted">0</b><span>En seguimiento</span></div>
+      <div class="cs-tile"><b id="csVendidos">0</b><span>Webs vendidas</span></div>
+      <div class="cs-tile gold"><b id="csEarn">0€</b><span>Ingresos estimados</span></div>
+    </div>
+    <div class="app-top">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <form class="searchbar" id="searchForm">
+        <svg class="ic ic18" style="opacity:.6"><use href="#ic-search"/></svg><input id="cityInput" list="cityList" placeholder="Escribe tu ciudad… (Málaga, Madrid, Barcelona…)" autocomplete="off">
+        <datalist id="cityList"></datalist>
+        <button type="submit">Buscar</button>
+      </form>
+      <div class="live">RADAR ACTIVO</div>
+    </div>
+
+    <div class="app-shell">
+      <aside class="app-side">
+        <div class="side-lbl">Panel</div>
+        <div class="side-menu">
+          <button class="side-item active" data-view="explorar"><span class="si-ic"><svg class="ic"><use href="#ic-target"/></svg></span> Explorar <span class="si-badge" id="badgeExplorar">6</span></button>
+          <button class="side-item" data-view="destacados"><span class="si-ic"><svg class="ic"><use href="#ic-star"/></svg></span> Destacados <span class="si-badge" id="badgeSaved">0</span></button>
+          <button class="side-item" data-view="contactados"><span class="si-ic"><svg class="ic"><use href="#ic-check"/></svg></span> Seguimiento <span class="si-badge" id="badgeContacted">0</span></button>
+          <button class="side-item" data-view="vendidos"><span class="si-ic"><svg class="ic"><use href="#ic-cash"/></svg></span> Vendidos <span class="si-badge" id="badgeVend">0</span></button>
+          <button class="side-item" data-view="stats"><span class="si-ic"><svg class="ic"><use href="#ic-chart"/></svg></span> Estadísticas</button>
+          <button class="side-item" data-view="ajustes"><span class="si-ic"><svg class="ic"><use href="#ic-gear"/></svg></span> Ajustes</button>
+        </div>
+        <div class="side-foot">
+          <div class="usercard" id="sideUser"><div class="uc-av" id="ucAv">?</div><div><b id="ucName">Invitado</b><span id="ucPlan">Inicia sesión</span></div></div>
+        </div>
+      </aside>
+
+      <div class="app-content">
+        <!-- EXPLORAR -->
+        <div class="view" data-view="explorar">
+          <div class="filterbar">
+            <input id="fSearch" class="finput" type="text" placeholder="Buscar negocio…" autocomplete="off">
+            <select id="fSector" class="fsel"><option value="all">Todos los sectores</option></select>
+            <select id="fRating" class="fsel"><option value="0">Cualquier valoración</option><option value="4">4,0★ o más</option><option value="4.5">4,5★ o más</option></select>
+            <select id="fSort" class="fsel"><option value="relevancia">Orden: relevancia</option><option value="rating">Mejor valorados</option><option value="reviews">Más reseñas</option><option value="az">A–Z</option></select>
+            <button id="fUncontacted" class="fchip" aria-pressed="false">Sin tocar</button>
+            <span class="fspacer"></span>
+            <button id="btnEmails" class="fchip">✉ Copiar emails</button>
+            <button id="btnCsv" class="fchip export">⬇ CSV</button>
+          </div>
+          <div class="app-body">
+            <div class="app-map" id="appMap">
+              <div class="grid-bg"></div>
+              <div class="sweep"></div>
+              <div class="chip-city"><svg class="ic ic18" style="opacity:.85"><use href="#ic-pin"/></svg><span id="mapChip">MÁLAGA · 6 sin web</span></div>
+              <div class="map-search"><svg class="ic ic18" style="opacity:.7"><use href="#ic-search"/></svg><input id="mapSearch" list="cityList" placeholder="Buscar ciudad…" autocomplete="off"><button id="mapSearchBtn">Ir</button></div>
+              <div class="map-zoom"><button id="zoomIn" title="Ampliar">+</button><button id="zoomOut" title="Alejar">−</button><button id="zoomReset" title="Ver toda España">⤢</button></div>
+              <div class="map-zones" id="mapZones">
+                <button data-city="Bilbao">Norte</button>
+                <button data-city="A Coruña">Noroeste</button>
+                <button data-city="Madrid">Centro</button>
+                <button data-city="Valencia">Levante</button>
+                <button data-city="Sevilla">Sur</button>
+                <button data-city="Palma">Islas</button>
+              </div>
+              <svg class="map-svg" id="appMapSvg" viewBox="0 0 1000 760" preserveAspectRatio="xMidYMid meet">
+                <g id="mapZoom">
+                  <path class="land" d="M51,135 L85,100 L164,60 L296,72 L443,88 L586,95 L720,125 L821,160 L951,184 L905,225 L869,263 L820,292 L776,319 L720,388 L731,470 L700,520 L663,565 L610,610 L558,650 L480,655 L399,656 L350,680 L314,712 L283,690 L230,625 L196,618 L214,525 L216,435 L226,360 L230,300 L175,255 L95,235 L95,205 L72,175 Z"/><path class="coastline" d="M51,135 L85,100 L164,60 L296,72 L443,88 L586,95 L720,125 L821,160 L951,184 L905,225 L869,263 L820,292 L776,319 L720,388 L731,470 L700,520 L663,565 L610,610 L558,650 L480,655 L399,656 L350,680 L314,712 L283,690 L230,625 L196,618 L214,525 L216,435 L226,360 L230,300 L175,255 L95,235 L95,205 L72,175 Z"/>
+                  <rect clip-path="url(#landClip)" x="0" y="0" width="1000" height="760" fill="url(#dotGrid)"/>
+                  <circle class="isle" cx="904" cy="416" r="14"/><circle class="isle" cx="952" cy="392" r="6"/><circle class="isle" cx="855" cy="452" r="8"/>
+                  <rect x="28" y="656" width="176" height="76" rx="10" fill="none" stroke="#7C5CFF" stroke-opacity=".28" stroke-dasharray="5 5"/>
+                  <text x="116" y="676" text-anchor="middle" fill="#64716A" font-size="15" font-weight="600">CANARIAS</text>
+                  <circle class="isle" cx="58" cy="702" r="6"/><circle class="isle" cx="90" cy="708" r="5"/><circle class="isle" cx="120" cy="696" r="7"/><circle class="isle" cx="152" cy="706" r="5"/><circle class="isle" cx="178" cy="699" r="4"/>
+                  <g id="mapLights" clip-path="url(#landClip)"></g>
+                  <g opacity="0.42"><line x1="480" y1="370" x2="480" y2="60" stroke="#7C5CFF" stroke-width="2.5"><animateTransform attributeName="transform" type="rotate" from="0 480 370" to="360 480 370" dur="7s" repeatCount="indefinite"/></line></g>
+                  <g id="mapPings"></g>
+                  <g id="mapCities"></g>
+                </g>
+              </svg>
+            </div>
+            <div class="app-list">
+              <div class="list-head"><b id="listTitle">Negocios sin web en Málaga</b><span class="count" id="listCount">6 encontrados</span></div>
+              <div class="list-scroll" id="leadList"></div>
+            </div>
+          </div>
+          <div class="map-tips">
+            <div class="mt-head"><b>Consejos para cerrar tu primera web</b><span>Sácale partido a cada lead</span></div>
+            <div class="mt-grid">
+              <div class="mt-card"><span class="mt-n">01</span><b>Ataca a los mejor valorados</b><p>Un negocio con 4,5★ y muchas reseñas ya tiene clientes: solo le falta la web. Convierten mucho mejor. Filtra por valoración alta.</p></div>
+              <div class="mt-card"><span class="mt-n">02</span><b>Personaliza el primer mensaje</b><p>El mensaje ya viene escrito, pero nombra su negocio y algo concreto (su barrio, sus reseñas). Un toque personal dispara la respuesta.</p></div>
+              <div class="mt-card"><span class="mt-n">03</span><b>Enseña un ejemplo al momento</b><p>Ten 1-2 webs de muestra del mismo sector listas para mandar. Ver es creer y acelera el “sí”.</p></div>
+              <div class="mt-card"><span class="mt-n">04</span><b>Haz seguimiento en 48h</b><p>Si no contestan, un segundo mensaje amable a los 2 días duplica las respuestas. Marca el estado “Seguimiento” para no perderlos.</p></div>
+            </div>
+            <div class="mt-data"><b>Dato:</b> el 42% de los pequeños negocios en España aún no tiene web propia. Cada uno es un cliente potencial esperando a que le escribas tú primero.</div>
+          </div>
+        </div>
+        <!-- DESTACADOS -->
+        <div class="view" data-view="destacados" hidden>
+          <div class="view-head"><b>⭐ Tus leads destacados</b><span class="count" id="savedCount">0 guardados</span></div>
+          <div class="leads-grid" id="savedGrid"></div>
+        </div>
+        <!-- CONTACTADOS -->
+        <div class="view" data-view="contactados" hidden>
+          <div class="view-head"><b>✅ Ya contactados</b><span class="count" id="contactedCount">0 contactados</span></div>
+          <div class="leads-grid" id="contactedGrid"></div>
+        </div>
+        <!-- ESTADÍSTICAS -->
+        <div class="view" data-view="stats" hidden>
+          <div class="view-head"><b>📊 Tu progreso</b><span class="count">estimación en vivo</span></div>
+          <div class="stats-body">
+            <div class="stat-grid">
+              <div class="stat-tile"><span class="st-ic">✅</span><b id="stContacted">0</b><span>Leads contactados</span></div>
+              <div class="stat-tile"><span class="st-ic">⭐</span><b id="stSaved">0</b><span>Guardados</span></div>
+              <div class="stat-tile"><span class="st-ic">💬</span><b id="stReplies">0</b><span>Respuestas estimadas</span></div>
+              <div class="stat-tile hot"><span class="st-ic">🌐</span><b id="stSales">0</b><span>Webs vendidas (est.)</span></div>
+            </div>
+            <div class="earn-card">
+              <div class="earn-top"><span>Ingresos potenciales este mes</span><b id="stEarn">0€</b></div>
+              <div class="earn-sub">Estimado a 400€ por web · configúralo en Ajustes</div>
+              <div class="goal">
+                <div class="goal-head"><span>Meta mensual: 5 webs</span><span id="goalTxt">0 / 5</span></div>
+                <div class="goal-bar"><i id="goalFill" style="width:0%"></i></div>
+              </div>
+            </div>
+            <div class="tip-card"><b>Consejo:</b> los negocios con <b>4,5★ o más</b> convierten mejor: ya confían clientes, solo les falta la web. Filtra por valoración alta en <b>Explorar</b>.</div>
+          </div>
+        </div>
+        <!-- VENDIDOS -->
+        <div class="view" data-view="vendidos" hidden>
+          <div class="view-head"><b>Webs vendidas</b><span class="count" id="vendCount">0 vendidas</span></div>
+          <div class="leads-grid" id="vendGrid"></div>
+        </div>
+        <!-- AJUSTES -->
+        <div class="view" data-view="ajustes" hidden>
+          <div class="view-head"><b>Ajustes de tu cuenta</b><span class="count">personaliza</span></div>
+          <div class="ajustes-body">
+            <div class="aj-card"><label>Precio por web vendida (€)</label><input id="ajPrice" type="number" value="400" min="0"><span class="aj-hint">Se usa para calcular tus ingresos estimados.</span></div>
+            <div class="aj-card"><label>Meta mensual (webs)</label><input id="ajGoal" type="number" value="5" min="1"><span class="aj-hint">Tu objetivo de ventas al mes.</span></div>
+            <div class="aj-card info"><div class="aj-row"><span>Plan actual</span><b id="ajPlan">Pro</b></div><div class="aj-row"><span>Cupo de leads</span><b id="ajQuota">500 leads/mes</b></div><div class="aj-row"><span>Provincias</span><b id="ajProv">5</b></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="sec-head reveal"><span class="eyebrow">Testimonios</span><h2>Lo que dicen los que ya <span class="accent">cazan</span></h2><p>Emprendedores jóvenes que empezaron con LeadHunter y hoy venden webs cada semana.</p></div>
+  <div class="testis">
+    <div class="testi reveal"><div class="stars">★★★★★</div><p>“En mi primera semana contacté 40 negocios y cerré 2 webs. Con lo que gané pagué el plan de todo el año.”</p><div class="who"><span class="av">M</span><div><b>Marcos, 19</b><span>Valencia</span></div></div></div>
+    <div class="testi reveal"><div class="stars">★★★★★</div><p>“Lo mejor es que el mensaje ya viene escrito. Solo abro WhatsApp y envío. He automatizado toda mi captación.”</p><div class="who"><span class="av">L</span><div><b>Lucía, 22</b><span>Sevilla</span></div></div></div>
+    <div class="testi reveal"><div class="stars">★★★★★</div><p>“Tenía 16 años y cero experiencia. El mapa me mostró decenas de negocios sin web en mi ciudad. Ahora es mi extra mensual.”</p><div class="who"><span class="av">D</span><div><b>Dani, 17</b><span>Málaga</span></div></div></div>
+  </div>
+</section>
+
+<section class="wrap" id="finalSec">
+  <div class="final reveal"><span class="eyebrow">Empieza hoy</span><h2>Mientras lo piensas, otro ya les está escribiendo</h2><p>Los negocios sin web se llevan igual. La única pregunta es quién les manda el mensaje primero. Que seas tú.</p><button class="btn" style="font-size:16px; padding:15px 26px;" data-open-plan="pro">Activar mi radar desde 9,99€ →</button></div>
+</section>
+
+<footer class="wrap">
+  <div class="foot">
+    <div class="foot-brand"><svg class="logo brand-logo"><use href="#lhLogo"/></svg><b>LeadHunter</b></div>
+    <div class="foot-links"><a href="#como">Cómo funciona</a><a href="#precios">Precios</a><a href="#app">La app</a><a href="#" id="navSupport2">Soporte</a></div>
+  </div>
+  <div class="foot-copy">© 2026 LeadHunter · Encuentra negocios sin web y véndeles la suya.</div>
+</footer>
+
+<div class="fab-stack">
+  <button class="fab wa" id="fabWa" title="Soporte por WhatsApp" aria-label="Soporte por WhatsApp"><svg class="wa-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.5A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .3-3.4-.7-2.9-1.2-4.7-4.1-4.9-4.3-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.2.2-.3.4-.1.7.2.3.9 1.4 1.9 2.3 1.3 1.1 2.3 1.5 2.6 1.6.2 0 .4 0 .6-.2l.9-1c.2-.2.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.6 0 .7Z"/></svg></button>
+  <button class="fab main" id="fabHunt"><span>Cazar leads</span> <svg class="ic"><use href="#ic-target"/></svg></button>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Suscripción">
+    <div class="modal-head"><div class="mtitle">Activar suscripción <span class="demo-tag">MODO DEMO</span></div><button class="modal-close" id="modalClose" aria-label="Cerrar">✕</button></div>
+    <div class="checkout" id="checkoutBody">
+      <div class="co-form">
+        <div class="co-plan-pick" id="planPick"><button data-pick="starter">Starter</button><button data-pick="pro" class="sel">Pro</button><button data-pick="elite">Élite</button></div>
+        <div class="field"><label>Email</label><input type="email" placeholder="tu@correo.com" value="widyagency.info@gmail.com"></div>
+        <div class="field"><label>Método de pago</label>
+          <div class="pay-methods" id="payMethods">
+            <button type="button" class="pm sel" data-pm="card"><span class="pmi">💳</span>Tarjeta</button>
+            <button type="button" class="pm" data-pm="paypal"><span class="pmb" style="background:#0070ba;color:#fff">Pay</span>PayPal</button>
+            <button type="button" class="pm" data-pm="bizum"><span class="pmb" style="background:#00c3e3;color:#04223a">Bi</span>Bizum</button>
+            <button type="button" class="pm" data-pm="gpay"><span class="pmi">🅶</span>G Pay</button>
+          </div>
+        </div>
+        <div id="cardFields">
+          <div class="field"><label style="display:flex; align-items:center;">Datos de la tarjeta <span class="card-brands"><i></i><i></i><i></i></span></label><input inputmode="numeric" placeholder="0000 0000 0000 0000"></div>
+          <div class="field-row"><div class="field"><label>Caducidad</label><input placeholder="MM / AA"></div><div class="field"><label>CVC</label><input placeholder="123"></div></div>
+          <div class="field"><label>Titular</label><input placeholder="Nombre y apellidos"></div>
+        </div>
+        <div id="altPay" hidden style="text-align:center; color:var(--muted); font-size:13.5px; padding:14px; border:1px dashed var(--line-strong); border-radius:12px;">Serás redirigido a <b id="altPayName" style="color:var(--text)">PayPal</b> para completar el pago de forma segura.</div>
+        <button class="pay-btn" id="payBtn">🔒 Pagar <span id="payAmount">14,99€</span></button>
+        <div class="secure-note">🔒 Pago simulado · en real: Stripe, PayPal y Bizum reales</div>
+      </div>
+      <div class="co-summary">
+        <div style="font-family:var(--font-mono); font-size:11px; letter-spacing:.14em; color:var(--muted); text-transform:uppercase;">Resumen del pedido</div>
+        <div class="co-plan-row"><b id="sumPlanName">Plan Pro</b><span id="sumPlanPrice" class="muted">14,99€/mes</span></div>
+        <div class="co-line"><span id="sumLeads">150 leads nuevos / mes</span></div>
+        <div class="co-line"><span>Facturación</span><span id="sumCycle">Mensual</span></div>
+        <div class="co-line"><span>IVA (21%)</span><span id="sumTax">3,15€</span></div>
+        <div class="co-total"><span>Total hoy</span><span id="sumTotal">18,14€</span></div>
+        <div style="font-size:12px; color:var(--faint); margin-top:auto;">Sin permanencia · cancela cuando quieras · 7 días de garantía</div>
+      </div>
+    </div>
+    <div class="co-success" id="coSuccess">
+      <div class="check">✓</div><h3>¡Radar activado! 🎯</h3>
+      <p id="successMsg">Tu plan Pro está listo. Ya puedes empezar a cazar leads sin web por toda España.</p>
+      <button class="btn" id="successGo" style="margin-top:8px;">Ir al panel →</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN MODAL -->
+<div class="overlay" id="loginOverlay">
+  <div class="modal login-modal" role="dialog" aria-modal="true" aria-label="Iniciar sesión">
+    <div class="modal-head"><div class="mtitle" id="loginTitle"><svg class="logo brand-logo" style="width:22px;height:22px"><use href="#lhLogo"/></svg> Entra en LeadHunter <span class="demo-tag">DEMO</span></div><button class="modal-close" id="loginClose" aria-label="Cerrar">✕</button></div>
+    <div class="login-body">
+      <div class="login-tabs"><button class="lt sel" data-lt="login">Iniciar sesión</button><button class="lt" data-lt="signup">Crear cuenta</button></div>
+      <button class="oauth-btn"><span class="g"></span> Continuar con Google</button>
+      <div class="divider">o con tu email</div>
+      <div class="field" id="nameField" hidden><label>Nombre</label><input id="suName" placeholder="Tu nombre"></div>
+      <div class="field"><label>Email</label><input id="liEmail" type="email" placeholder="tu@correo.com" value="widyagency.info@gmail.com"></div>
+      <div class="field"><label>Contraseña</label><input id="liPass" type="password" placeholder="••••••••"></div>
+      <button class="pay-btn" id="loginSubmit">Entrar</button>
+      <div class="secure-note">🔒 Demo · no se guarda ninguna contraseña real</div>
+    </div>
+  </div>
+</div>
+
+<!-- GATE: verificación de suscripción + onboarding (panel privado) -->
+<div class="overlay" id="gateOverlay">
+  <div class="gate-card">
+    <div class="gate-step" id="gsVerify">
+      <div class="spinner"></div>
+      <h3>Verificando tu suscripción…</h3>
+      <p>Comprobando que tu cuenta está activa y suscrita al servicio.</p>
+    </div>
+    <div class="gate-step" id="gsOk" hidden>
+      <div class="gate-check">✓</div>
+      <h3>Suscripción verificada</h3>
+      <span class="gate-badge" id="gatePlan">PLAN PRO · ACTIVO</span>
+      <p>Acceso concedido al panel privado con <b style="color:var(--radar)">+65.000 negocios sin web</b> de toda España.</p>
+      <button class="pay-btn" id="gateContinue" style="width:100%">Continuar →</button>
+    </div>
+    <div class="gate-step" id="gsCity" hidden>
+      <svg class="gate-logo"><use href="#lhLogo"/></svg>
+      <h3>¿Dónde quieres empezar a cazar?</h3>
+      <p id="gateCityHint">Tu plan te da acceso a 5 provincias.</p>
+      <input class="gate-input" id="gateCity" list="cityList" placeholder="Escribe tu ciudad (Madrid, Málaga…)">
+      <button class="pay-btn" id="gateEnter" style="width:100%">Entrar a mi panel privado →</button>
+      <span class="gate-hint">Podrás cambiar de ciudad desde el panel.</span>
+    </div>
+  </div>
+</div>
+
+<!-- SOPORTE -->
+<div class="overlay" id="supportOverlay">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-head"><div class="mtitle">💬 Centro de soporte</div><button class="modal-close" id="supportClose" aria-label="Cerrar">✕</button></div>
+    <div style="padding:22px; display:grid; gap:12px;">
+      <p style="color:var(--muted); font-size:14px; margin:0;">¿Necesitas ayuda? Estamos para ti. Elige cómo prefieres contactarnos.</p>
+      <button class="support-opt" id="supWa"><span>🟢</span><div class="so-txt"><b>WhatsApp</b><span>Respuesta en minutos</span></div><span class="arr">→</span></button>
+      <button class="support-opt" id="supMail"><span>✉️</span><div class="so-txt"><b>Email</b><span>widyagency.info@gmail.com</span></div><span class="arr">→</span></button>
+      <button class="support-opt" id="supChat"><span>💬</span><div class="so-txt"><b>Chat en vivo</b><span>Lun–Vie · 9:00–20:00</span></div><span class="arr">→</span></button>
+      <div class="faq">
+        <div class="faq-q">¿Cada cuánto se actualizan los leads?<span>Añadimos negocios sin web nuevos cada día a la base de datos.</span></div>
+        <div class="faq-q">¿Puedo cambiar de plan o cancelar?<span>Sí, cuando quieras desde tu panel. Sin permanencia.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+(function(){
+  "use strict";
+  var CITY_COORDS = {
+    "Madrid":{x:450,y:345,maj:1},"Barcelona":{x:869,y:263,maj:1},"Valencia":{x:687,y:425,maj:1},"Sevilla":{x:287,y:600,maj:1},
+    "Málaga":{x:399,y:648,maj:1},"Bilbao":{x:504,y:108,maj:1},"Zaragoza":{x:651,y:241,maj:1},"Palma":{x:904,y:416,maj:1},
+    "Murcia":{x:634,y:550},"A Coruña":{x:114,y:98},"Alicante":{x:680,y:519},"Granada":{x:457,y:618},
+    "Córdoba":{x:374,y:558},"Vigo":{x:95,y:196},"Valladolid":{x:377,y:241},"Santander":{x:443,y:96},
+    "Gijón":{x:310,y:81},"San Sebastián":{x:573,y:100},"Pamplona":{x:597,y:143},"Almería":{x:539,y:648},
+    "Salamanca":{x:310,y:299},"Cartagena":{x:644,y:583},"Las Palmas":{x:120,y:700},"Tenerife":{x:66,y:704}
+  };
+  var TYPES = [
+    {cat:"PELUQUERÍA",area:"Centro",desc:function(c){return "Peluquería de barrio con 4,7★ y 210 reseñas. Muy activa, pero sin ninguna presencia online.";},msg:function(n,c){return "¡Hola! Vi que "+n+" tiene reseñas geniales en "+c+" pero no tenéis web. Puedo montaros una para captar clientas nuevas por Google. ¿Te enseño un ejemplo?";}},
+    {cat:"HOSTELERÍA",area:"Zona centro",desc:function(c){return "Bar de tapas con mucho público joven. Solo Instagram, sin web, carta digital ni reservas online.";},msg:function(n,c){return "¡Buenas! Me encanta el ambiente de "+n+". ¿Habéis pensado en una web con carta digital y reservas? La monto en pocos días y os llega más gente. ¿Hablamos?";}},
+    {cat:"TALLER",area:"Polígono",desc:function(c){return "Taller con clientela fiel desde hace años. Cero presencia online; pierde clientes que buscan en Google.";},msg:function(n,c){return "¡Hola! Busqué talleres en "+c+" y "+n+" no sale en Google por no tener web. Puedo solucionarlo y traeros clientes nuevos cada semana. ¿Te interesa?";}},
+    {cat:"CLÍNICA",area:"Ensanche",desc:function(c){return "Clínica dental con buena reputación local. Sin web ni citas online, todo por teléfono.";},msg:function(n,c){return "¡Hola! En "+c+" cada vez más pacientes buscan clínica por internet. "+n+" no tiene web y podría captar muchas más citas. ¿Te preparo una propuesta?";}},
+    {cat:"MODA",area:"Casco antiguo",desc:function(c){return "Tienda de ropa con estilo propio. Solo vende en local; sin tienda online ni escaparate digital.";},msg:function(n,c){return "¡Hola! "+n+" tiene unas prendas geniales pero no las ve nadie fuera de "+c+". Con una tienda online venderíais también por internet. ¿Lo vemos?";}},
+    {cat:"FITNESS",area:"Zona norte",desc:function(c){return "Gimnasio de barrio en crecimiento. Sin web para captar socios ni gestionar clases online.";},msg:function(n,c){return "¡Buenas! Muchos que buscan gimnasio en "+c+" no encuentran "+n+" porque no tenéis web. Puedo montaros una con captación de socios. ¿Te enseño?";}},
+    {cat:"INMOBILIARIA",area:"Ensanche",desc:function(c){return "Inmobiliaria con buena cartera de pisos. Sin web donde mostrar inmuebles, todo por escaparate.";},msg:function(n,c){return "¡Hola! En "+c+" la gente busca piso en Google y "+n+" no sale por no tener web. Puedo montaros un portal con vuestros inmuebles. ¿Lo vemos?";}},
+    {cat:"VETERINARIO",area:"Barrio",desc:function(c){return "Clínica veterinaria con clientes fieles. Sin web ni sistema de citas online.";},msg:function(n,c){return "¡Hola! Muchos dueños buscan veterinario en "+c+" por internet y "+n+" no aparece. Puedo solucionarlo con una web y citas online. ¿Te interesa?";}},
+    {cat:"PANADERÍA",area:"Centro",desc:function(c){return "Panadería artesana muy querida en el barrio. Sin presencia online ni pedidos por internet.";},msg:function(n,c){return "¡Buenas! "+n+" tiene un producto genial pero no se ve online. Con una web y pedidos por WhatsApp venderíais más en "+c+". ¿Hablamos?";}},
+    {cat:"ABOGADOS",area:"Zona alta",desc:function(c){return "Despacho de abogados con buena reputación. Sin web donde captar clientes nuevos.";},msg:function(n,c){return "¡Hola! Los clientes buscan abogado en Google y "+n+" no sale por no tener web. Puedo montaros una web profesional en "+c+". ¿Te preparo una propuesta?";}},
+    {cat:"ACADEMIA",area:"Universidad",desc:function(c){return "Academia de refuerzo y idiomas con demanda alta. Sin web para captar alumnos ni inscripciones.";},msg:function(n,c){return "¡Hola! En "+c+" los padres buscan academia por internet y "+n+" no tiene web. Puedo montaros una con inscripción online. ¿Te enseño un ejemplo?";}}
+  ];
+  var NAMES = { "PELUQUERÍA":["Peluquería Marisa","Estilo & Tijeras","Look Studio","Peluquería Nuria"],"HOSTELERÍA":["Bar La Esquina","Tapas El Rincón","Cervecería Central","Bar Manolo"],"TALLER":["Taller Motos Rico","Auto Servicio Pérez","Talleres Hermanos Gil","Motor Sur"],"CLÍNICA":["Clínica Dental Sonrisa","Fisio Salud","Dental Care","Centro Médico Vida"],"MODA":["Boutique Lola","Urban Style","Moda Carmen","The Closet"],"FITNESS":["Gimnasio PowerFit","Box CrossZone","Fit Center","Energy Gym"],"INMOBILIARIA":["Inmobiliaria Costa","Fincas García","Hogar Real","Grupo Vivienda"],"VETERINARIO":["Clínica Veterinaria Patitas","VetSalud","Animal Center","Mascotas Sanas"],"PANADERÍA":["Panadería La Espiga","Horno San José","Pan y Dulce","La Tahona"],"ABOGADOS":["Abogados Ruiz","Legal Prime","Bufete Martín","Jurídico Sur"],"ACADEMIA":["Academia Éxito","Aula Plus","Centro de Estudios Norte","Idiomas Global"] };
+
+  function seedFor(s){ var h=0; for(var i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))>>>0; } return h; }
+  function phoneFrom(seed){ var s=String(600000000+(seed%99999999)); return "+34 "+s.slice(0,3)+" "+s.slice(3,6)+" "+s.slice(6,9); }
+  function slug(n){ return n.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,""); }
+  var LEAD_INDEX = {};
+  var BARRIOS=["Centro","Zona Norte","Zona Sur","Casco Antiguo","Ensanche","La Playa","Polígono","Barrio Alto","Distrito Este","Afueras"];
+  function keyOf(L){ return L.id; }
+  function buildLeads(city, n){
+    n = n||6; var out=[], cc=CITY_COORDS[city]||{x:450,y:345};
+    for(var i=0;i<n;i++){
+      var t=TYPES[i%TYPES.length], pool=NAMES[t.cat], base=pool[(seedFor(city)+i)%pool.length], seed=seedFor(city+base+i);
+      var barrio=BARRIOS[seed%BARRIOS.length];
+      var rating=((35+(seed%15))/10), reviews=20+(seed%480);
+      var ox=((seed%460)/10-23), oy=(((seed>>6)%460)/10-23);
+      var L={ id:city+"#"+i, city:city, name:base, cat:t.cat, area:barrio, rating:rating, reviews:reviews, desc:t.desc(city), msg:t.msg(base,city), email:slug(base)+"."+slug(barrio)+"@gmail.com", phone:phoneFrom(seed), waNumber:"34"+String(600000000+(seed%99999999)), px:(cc.x+ox), py:(cc.y+oy) };
+      LEAD_INDEX[keyOf(L)]=L; out.push(L);
+    }
+    return out;
+  }
+  var appMode=false, activePlan=null, loggedIn=false, currentUserName='';
+  var APP_RENDER={ starter:45, pro:90, elite:160 };
+  var QUOTA_NUM={ starter:'100', pro:'500', elite:'∞' };
+  var QUOTA_LABEL={ starter:'100 leads/mes', pro:'500 leads/mes', elite:'Leads ilimitados' };
+  var PLAN_CITIES={ starter:1, pro:5, elite:Infinity };
+  var DB_TOTAL='65.000+';
+  var citiesUsed=new Set();
+  var pricePerWeb=400, monthlyGoal=5;
+  function appLeadCount(){ return appMode ? (APP_RENDER[activePlan]||48) : 6; }
+
+  var savedKeys=new Set(), leadStatus={};
+  var STATUSES=[{v:'nuevo',label:'Nuevo',emo:'🟡'},{v:'contactado',label:'Contactado',emo:'🟢'},{v:'respondio',label:'Respondió',emo:'💬'},{v:'vendido',label:'Vendido',emo:'✅'}];
+  function statusOf(k){ return leadStatus[k]||'nuevo'; }
+  function isContacted(k){ return statusOf(k)!=='nuevo'; }
+  function counts(){ var c={contacted:0,replies:0,vendidos:0}; Object.keys(leadStatus).forEach(function(k){ var s=leadStatus[k]; if(s!=='nuevo')c.contacted++; if(s==='respondio'||s==='vendido')c.replies++; if(s==='vendido')c.vendidos++; }); return c; }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  var WA_SVG='<svg class="wa-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.5A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .3-3.4-.7-2.9-1.2-4.7-4.1-4.9-4.3-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.2.2-.3.4-.1.7.2.3.9 1.4 1.9 2.3 1.3 1.1 2.3 1.5 2.6 1.6.2 0 .4 0 .6-.2l.9-1c.2-.2.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.6 0 .7Z"/></svg>';
+
+  function statusOptions(cur){ return STATUSES.map(function(s){ return '<option value="'+s.v+'"'+(s.v===cur?' selected':'')+'>'+s.label+'</option>'; }).join(''); }
+  function leadCard(L, idx){
+    var k=keyOf(L), saved=savedKeys.has(k), st=statusOf(k);
+    return '<article class="lead st-'+st+'" data-key="'+esc(k)+'" style="animation-delay:'+(idx*35)+'ms">'
+      + '<div class="lead-top"><div>'
+        + '<div class="lead-name">'+esc(L.name)+'</div>'
+        + '<div class="lead-cat">'+esc(L.cat)+' · '+esc(L.area)+' · '+esc(L.city)+' · <span style="color:var(--gold)">'+L.rating.toFixed(1).replace(".",",")+'★</span> ('+L.reviews+')</div>'
+      + '</div><span class="badge-noweb">◈ SIN WEB</span></div>'
+      + '<p class="desc">'+esc(L.desc)+'</p>'
+      + '<div class="rows"><div class="row"><span class="k">✉</span> '+esc(L.email)+'</div><div class="row"><span class="k">☎</span> '+esc(L.phone)+'</div></div>'
+      + '<div class="msg"><span class="lbl">Mensaje recomendado</span>'+esc(L.msg)+'</div>'
+      + '<div class="lead-meta"><span class="meta-lbl">Estado</span><select class="lead-status-sel sel-'+st+'" data-key="'+esc(k)+'">'+statusOptions(st)+'</select></div>'
+      + '<div class="actions">'
+        + '<a class="btn-wa" href="https://wa.me/'+L.waNumber+'?text='+encodeURIComponent(L.msg)+'" target="_blank" rel="noopener">'+WA_SVG+' WhatsApp</a>'
+        + '<a class="btn-icon" href="tel:'+L.phone.replace(/\s/g,'')+'" title="Llamar"><svg class="ic"><use href="#ic-phone"/></svg></a>'
+        + '<button class="btn-icon js-copymsg" data-msg="'+encodeURIComponent(L.msg)+'" title="Copiar mensaje"><svg class="ic"><use href="#ic-msg"/></svg></button>'
+        + '<button class="btn-icon js-save'+(saved?' saved':'')+'" title="Guardar"><svg class="ic"><use href="#ic-star"/></svg></button>'
+        + '<button class="btn-icon js-copy" data-copy="'+esc(L.name+' — '+L.email+' — '+L.phone)+'" title="Copiar datos"><svg class="ic"><use href="#ic-copy"/></svg></button>'
+      + '</div></article>';
+  }
+
+  var leadList=document.getElementById('leadList'), listTitle=document.getElementById('listTitle'), listCount=document.getElementById('listCount'),
+      mapChip=document.getElementById('mapChip'), mapPings=document.getElementById('mapPings'), mapCities=document.getElementById('mapCities');
+
+  var currentCity='Málaga';
+  var filters={ sector:'all', rating:0, uncontacted:false, text:'', sort:'relevancia' };
+  function currentFiltered(){
+    var arr=buildLeads(currentCity, appLeadCount()).filter(function(L){
+      if(filters.sector!=='all' && L.cat!==filters.sector) return false;
+      if(filters.rating && L.rating < filters.rating) return false;
+      if(filters.uncontacted && isContacted(keyOf(L))) return false;
+      if(filters.text){ var t=filters.text.toLowerCase(); if((L.name+' '+L.cat+' '+L.area).toLowerCase().indexOf(t)<0) return false; }
+      return true;
+    });
+    if(filters.sort==='rating') arr.sort(function(a,b){ return b.rating-a.rating; });
+    else if(filters.sort==='reviews') arr.sort(function(a,b){ return b.reviews-a.reviews; });
+    else if(filters.sort==='az') arr.sort(function(a,b){ return a.name.localeCompare(b.name); });
+    return arr;
+  }
+  function applyFilters(){
+    var all=buildLeads(currentCity, appLeadCount()), leads=currentFiltered();
+    listTitle.textContent="Negocios sin web en "+currentCity;
+    listCount.textContent=leads.length+(leads.length!==all.length?(" de "+all.length):" encontrados");
+    document.getElementById('badgeExplorar').textContent=all.length;
+    mapChip.textContent=currentCity.toUpperCase()+" · "+leads.length+" sin web";
+    leadList.innerHTML= leads.length ? leads.map(leadCard).join('')
+      : '<div class="empty"><div class="ee"><svg class="ic" style="width:34px;height:34px;opacity:.5"><use href="#ic-search"/></svg></div><b>Ningún negocio con esos filtros</b><span>Baja la valoración mínima o cambia de sector.</span></div>';
+    mapPings.innerHTML=leads.map(function(L,k){
+      var st=statusOf(keyOf(L)), cls=(st!=='nuevo'?(' pst-'+st):'');
+      return '<circle class="lead-ping'+cls+'" data-key="'+esc(keyOf(L))+'" cx="'+L.px.toFixed(1)+'" cy="'+L.py.toFixed(1)+'" r="4.3" style="animation-delay:'+(k*22)+'ms"><title>'+esc(L.name)+' · '+esc(L.cat)+'</title></circle>';
+    }).join('');
+    mapCities.innerHTML=Object.keys(CITY_COORDS).map(function(name){
+      var cc=CITY_COORDS[name], act=(name===currentCity), showLbl=(act||cc.maj);
+      var g='<g class="svg-city'+(act?' active':'')+'" data-city="'+name+'">';
+      if(act){ g+='<circle class="ring" cx="'+cc.x+'" cy="'+cc.y+'" r="17"/>'; }
+      g+='<circle class="node" cx="'+cc.x+'" cy="'+cc.y+'" r="'+(act?7:(cc.maj?5.5:4))+'"/>';
+      if(showLbl){ g+='<text class="lbl" x="'+cc.x+'" y="'+(cc.y-15)+'" text-anchor="middle">'+name+(act?(' · '+leads.length):'')+'</text>'; }
+      return g+'</g>';
+    }).join('');
+  }
+  function renderCity(city){ currentCity=city; document.getElementById('cityInput').value=city; applyFilters(); }
+  function renderMapLights(){
+    var g=document.getElementById('mapLights'); if(!g) return;
+    var html=Object.keys(CITY_COORDS).map(function(n){ var c=CITY_COORDS[n], r=(c.maj?60:36); return '<circle cx="'+c.x+'" cy="'+c.y+'" r="'+r+'" fill="url(#cityLight)" opacity="'+(c.maj?.62:.4)+'"/>'; }).join('');
+    var extra='';
+    for(var i=0;i<48;i++){ var s=seedFor('lx'+i), cx=60+(s%880), cy=55+((s>>4)%670), rr=5+(s%11); extra+='<circle cx="'+cx+'" cy="'+cy+'" r="'+rr+'" fill="url(#cityLight)" opacity="'+(0.08+(s%22)/140).toFixed(2)+'"/>'; }
+    g.innerHTML=html+extra;
+  }
+
+  function renderGrid(id, keys, emptyIcon, emptyTitle, emptyText){
+    var el=document.getElementById(id);
+    var arr=Array.from(keys).map(function(k){ return LEAD_INDEX[k]; }).filter(Boolean);
+    if(!arr.length){ el.innerHTML='<div class="empty"><div class="ee">'+emptyIcon+'</div><b>'+emptyTitle+'</b><span>'+emptyText+'</span></div>'; return; }
+    el.innerHTML=arr.map(leadCard).join('');
+  }
+  function refreshViews(){
+    var c=counts(), contactedArr=Object.keys(leadStatus).filter(function(k){ return leadStatus[k]!=='nuevo'; });
+    document.getElementById('badgeSaved').textContent=savedKeys.size;
+    document.getElementById('badgeContacted').textContent=contactedArr.length;
+    document.getElementById('savedCount').textContent=savedKeys.size+' guardados';
+    document.getElementById('contactedCount').textContent=contactedArr.length+' en seguimiento';
+    renderGrid('savedGrid', savedKeys, '⭐', 'Aún no tienes destacados', 'Pulsa la estrella ☆ en cualquier lead para guardarlo aquí.');
+    renderGrid('contactedGrid', contactedArr, '✅', 'Aún no has movido ningún lead', 'Contacta o cambia el estado de un lead y aparecerá aquí.');
+    renderStats();
+    var setTxt=function(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; };
+    var vend=Object.keys(leadStatus).filter(function(k){ return leadStatus[k]==='vendido'; });
+    setTxt('csContacted', c.contacted);
+    setTxt('csVendidos', c.vendidos);
+    setTxt('csEarn', (c.vendidos*pricePerWeb).toLocaleString('es-ES')+'€');
+    setTxt('badgeVend', vend.length);
+    setTxt('vendCount', vend.length+' vendidas');
+    renderGrid('vendGrid', vend, '', 'Aún no has vendido ninguna web', 'Marca un lead como “Vendido” y aparecerá aquí con tus ingresos.');
+  }
+  function renderStats(){
+    var c=counts(), earn=c.vendidos*pricePerWeb, goal=Math.min(100, Math.round(c.vendidos/monthlyGoal*100));
+    var setTxt=function(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; };
+    setTxt('stContacted', c.contacted);
+    setTxt('stSaved', savedKeys.size);
+    setTxt('stReplies', c.replies);
+    setTxt('stSales', c.vendidos);
+    setTxt('stEarn', earn.toLocaleString('es-ES')+'€');
+    setTxt('goalTxt', c.vendidos+' / '+monthlyGoal);
+    var gf=document.getElementById('goalFill'); if(gf) gf.style.width=goal+'%';
+  }
+
+  // datalist
+  document.getElementById('cityList').innerHTML=Object.keys(CITY_COORDS).map(function(c){ return '<option value="'+c+'">'; }).join('');
+
+  // toast
+  var toastWrap=document.getElementById('toastWrap');
+  function toast(msg, icon){ var t=document.createElement('div'); t.className='toast'; t.innerHTML='<span class="ic">'+(icon||'✓')+'</span>'+esc(msg); toastWrap.appendChild(t); setTimeout(function(){ t.style.transition='opacity .4s, transform .4s'; t.style.opacity='0'; t.style.transform='translateY(10px)'; setTimeout(function(){ t.remove(); },400); },2600); }
+
+  function copyText(txt, okMsg){ (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(function(){ toast(okMsg,'⧉'); }).catch(function(){ toast(okMsg,'⧉'); }); }
+  function setStatus(key, val){
+    if(val==='nuevo') delete leadStatus[key]; else leadStatus[key]=val;
+    document.querySelectorAll('.lead[data-key="'+key+'"]').forEach(function(card){
+      card.className='lead st-'+val;
+      var sel=card.querySelector('.lead-status-sel'); if(sel){ sel.value=val; sel.className='lead-status-sel sel-'+val; }
+    });
+    refreshViews();
+    if(val==='vendido'){ confetti(); toast('¡Venta cerrada! 🎉 +400€ estimados','🎉'); }
+  }
+  // lead actions (delegated on whole app)
+  document.querySelector('.app').addEventListener('click', function(e){
+    var card=e.target.closest('.lead'); if(!card) return;
+    var key=card.getAttribute('data-key'), L=LEAD_INDEX[key];
+    var wa=e.target.closest('.btn-wa');
+    if(wa){ var kk=key; setTimeout(function(){ if(statusOf(kk)==='nuevo') setStatus(kk,'contactado'); }, 60);
+      toast('Abriendo WhatsApp · '+(L?L.name:''),'💬'); return; }
+    var cm=e.target.closest('.js-copymsg');
+    if(cm){ copyText(decodeURIComponent(cm.getAttribute('data-msg')), 'Mensaje copiado'); return; }
+    var sv=e.target.closest('.js-save');
+    if(sv){ var on; if(savedKeys.has(key)){ savedKeys.delete(key); on=false; } else { savedKeys.add(key); on=true; }
+      refreshViews();
+      document.querySelectorAll('.lead[data-key="'+key+'"] .js-save').forEach(function(b){ b.classList.toggle('saved', on); });
+      toast(on?'Lead añadido a Destacados ⭐':'Lead quitado de Destacados', on?'★':'☆'); return; }
+    var cp=e.target.closest('.js-copy');
+    if(cp){ copyText(cp.getAttribute('data-copy'), 'Datos copiados al portapapeles'); return; }
+  });
+  document.querySelector('.app').addEventListener('change', function(e){
+    var sel=e.target.closest('.lead-status-sel'); if(!sel) return;
+    setStatus(sel.getAttribute('data-key'), sel.value);
+  });
+  function confetti(){
+    var host=document.createElement('div'); host.className='confetti'; document.body.appendChild(host);
+    var cols=['#7C5CFF','#4CC4E8','#FF5C97','#F5C851']; var n=70;
+    for(var i=0;i<n;i++){ var p=document.createElement('i'); var s=seedFor('cf'+i);
+      p.style.left=(s%100)+'vw'; p.style.background=cols[s%cols.length];
+      p.style.animationDelay=((s%12)/20)+'s'; p.style.transform='rotate('+(s%360)+'deg)';
+      host.appendChild(p);
+    }
+    setTimeout(function(){ host.remove(); }, 2600);
+  }
+
+  // view switching
+  document.querySelectorAll('.side-item').forEach(function(item){
+    item.addEventListener('click', function(){
+      var v=item.getAttribute('data-view');
+      document.querySelectorAll('.side-item').forEach(function(i){ i.classList.toggle('active', i===item); });
+      document.querySelectorAll('.view').forEach(function(view){ view.hidden = view.getAttribute('data-view')!==v; });
+    });
+  });
+
+  // search
+  var form=document.getElementById('searchForm'), input=document.getElementById('cityInput');
+  function goToCity(v){
+    v=(v||'').trim(); if(!v) return;
+    var keys=Object.keys(CITY_COORDS);
+    var match=keys.find(function(c){ return c.toLowerCase()===v.toLowerCase(); }) || keys.find(function(c){ return c.toLowerCase().indexOf(v.toLowerCase())===0; });
+    document.querySelector('.side-item[data-view="explorar"]').click();
+    if(match){
+      if(appMode){
+        var lim=PLAN_CITIES[activePlan]||1;
+        if(!citiesUsed.has(match) && citiesUsed.size>=lim){
+          toast('Tu plan permite '+lim+' '+(lim===1?'provincia':'provincias')+'. Pásate a Élite para toda España.','🔒');
+          document.getElementById('cityInput').value=currentCity; return;
+        }
+        citiesUsed.add(match);
+      }
+      renderCity(match); zoomToCity(match); toast('Radar apuntado a '+match,'🎯');
+    }
+    else { toast('Aún no cubrimos "'+v+'" en la demo. Prueba Madrid, Barcelona, Valencia…','📍'); }
+  }
+  form.addEventListener('submit', function(e){ e.preventDefault(); goToCity(input.value); });
+  var appSvgEl=document.getElementById('appMapSvg');
+  function focusLead(k){
+    document.querySelector('.side-item[data-view="explorar"]').click();
+    var card=leadList.querySelector('.lead[data-key="'+k+'"]');
+    if(card){ card.scrollIntoView({behavior:'smooth', block:'center'}); card.classList.add('flash'); setTimeout(function(){ card.classList.remove('flash'); },1300); }
+    else { var L=LEAD_INDEX[k]; toast((L?L.name:'Negocio')+' — quita filtros para verlo','📍'); }
+  }
+  appSvgEl.addEventListener('click', function(e){
+    if(dragMoved){ dragMoved=false; return; }
+    var g=e.target.closest('.svg-city'); if(g){ goToCity(g.getAttribute('data-city')); return; }
+    var lp=e.target.closest('.lead-ping'); if(lp){ focusLead(lp.getAttribute('data-key')); return; }
+    // clic en cualquier parte → ciudad más cercana
+    try{ var pt=appSvgEl.createSVGPoint(); pt.x=e.clientX; pt.y=e.clientY; var loc=pt.matrixTransform(mapZoomG.getScreenCTM().inverse());
+      var best=null, bd=1e9; Object.keys(CITY_COORDS).forEach(function(n){ var c=CITY_COORDS[n], d=(c.x-loc.x)*(c.x-loc.x)+(c.y-loc.y)*(c.y-loc.y); if(d<bd){ bd=d; best=n; } });
+      if(best) goToCity(best);
+    }catch(err){}
+  });
+
+  // ZOOM / PAN / búsqueda desde el mapa
+  var mapZoomG=document.getElementById('mapZoom'), appMapEl=document.getElementById('appMap');
+  var mScale=1, mTX=0, mTY=0, dragMoved=false;
+  function applyMapZoom(){ var lx=(mScale-1)*560, ly=(mScale-1)*420; mTX=Math.max(-lx,Math.min(lx,mTX)); mTY=Math.max(-ly,Math.min(ly,mTY)); mapZoomG.setAttribute('transform','translate('+mTX.toFixed(1)+','+mTY.toFixed(1)+') scale('+mScale.toFixed(3)+')'); }
+  function zoomBy(factor){ var s0=mScale, s1=Math.max(1,Math.min(6,s0*factor)); var cx=(500-mTX)/s0, cy=(380-mTY)/s0; mScale=s1; mTX=500-cx*s1; mTY=380-cy*s1; if(s1<=1){ mTX=0; mTY=0; } applyMapZoom(); }
+  function zoomToCity(name){ if(!appMode) return; var cc=CITY_COORDS[name]; if(!cc) return; mScale=2.1; mTX=500-cc.x*mScale; mTY=380-cc.y*mScale; applyMapZoom(); }
+  document.getElementById('zoomIn').addEventListener('click',function(){ zoomBy(1.4); });
+  document.getElementById('zoomOut').addEventListener('click',function(){ zoomBy(1/1.4); });
+  document.getElementById('zoomReset').addEventListener('click',function(){ mScale=1; mTX=0; mTY=0; applyMapZoom(); });
+  document.getElementById('mapSearchBtn').addEventListener('click',function(){ goToCity(document.getElementById('mapSearch').value); });
+  document.getElementById('mapSearch').addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); goToCity(this.value); } });
+  appMapEl.addEventListener('wheel',function(e){ e.preventDefault(); zoomBy(e.deltaY<0?1.18:1/1.18); }, {passive:false});
+  var dragging=false, dsx=0, dsy=0, dox=0, doy=0;
+  appMapEl.addEventListener('pointerdown',function(e){ if(e.target.closest('.map-search')||e.target.closest('.map-zoom')||e.target.closest('.map-zones')||e.target.closest('.svg-city')||e.target.closest('.lead-ping')) return; if(mScale<=1) return; dragging=true; dragMoved=false; appMapEl.classList.add('grabbing'); dsx=e.clientX; dsy=e.clientY; dox=mTX; doy=mTY; });
+  window.addEventListener('pointermove',function(e){ if(!dragging) return; if(Math.abs(e.clientX-dsx)+Math.abs(e.clientY-dsy)>4) dragMoved=true; var r=appMapEl.getBoundingClientRect(), f=1000/r.width; mTX=dox+(e.clientX-dsx)*f; mTY=doy+(e.clientY-dsy)*f; applyMapZoom(); });
+  window.addEventListener('pointerup',function(){ if(dragging){ dragging=false; appMapEl.classList.remove('grabbing'); } });
+  document.getElementById('mapZones').addEventListener('click',function(e){ var b=e.target.closest('button'); if(b) goToCity(b.getAttribute('data-city')); });
+
+  // filters
+  var fSector=document.getElementById('fSector');
+  fSector.innerHTML='<option value="all">Todos los sectores</option>'+TYPES.map(function(t){ return '<option value="'+t.cat+'">'+t.cat.charAt(0)+t.cat.slice(1).toLowerCase()+'</option>'; }).join('');
+  fSector.addEventListener('change',function(){ filters.sector=fSector.value; applyFilters(); });
+  document.getElementById('fRating').addEventListener('change',function(){ filters.rating=parseFloat(this.value); applyFilters(); });
+  document.getElementById('fSort').addEventListener('change',function(){ filters.sort=this.value; applyFilters(); });
+  document.getElementById('fSearch').addEventListener('input',function(){ filters.text=this.value.trim(); applyFilters(); });
+  document.getElementById('fUncontacted').addEventListener('click',function(){ filters.uncontacted=!filters.uncontacted; this.setAttribute('aria-pressed',filters.uncontacted); applyFilters(); });
+  document.getElementById('btnEmails').addEventListener('click',function(){ var ls=currentFiltered(); if(!ls.length){ toast('No hay emails que copiar'); return; } copyText(ls.map(function(L){return L.email;}).join(', '), ls.length+' emails copiados'); });
+  document.getElementById('ajPrice').addEventListener('input',function(){ pricePerWeb=parseInt(this.value,10)||0; refreshViews(); });
+  document.getElementById('ajGoal').addEventListener('input',function(){ monthlyGoal=Math.max(1,parseInt(this.value,10)||1); refreshViews(); });
+
+  // export CSV
+  document.getElementById('btnCsv').addEventListener('click',function(){
+    var leads=currentFiltered();
+    if(!leads.length){ toast('No hay leads que exportar con estos filtros','📄'); return; }
+    var rows=[['Nombre','Sector','Zona','Ciudad','Valoracion','Resenas','Email','Telefono','Mensaje']];
+    leads.forEach(function(L){ rows.push([L.name,L.cat,L.area,L.city,L.rating.toFixed(1),L.reviews,L.email,L.phone,L.msg]); });
+    var csv=rows.map(function(r){ return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+    var blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'}), url=URL.createObjectURL(blob);
+    var a=document.createElement('a'); a.href=url; a.download='leads-'+currentCity.toLowerCase()+'.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    toast(leads.length+' leads exportados a CSV','⬇');
+  });
+
+  // card input formatting (demo)
+  var cardInput=document.querySelector('#checkoutBody input[inputmode="numeric"]');
+  if(cardInput){ cardInput.addEventListener('input',function(){ var v=this.value.replace(/\D/g,'').slice(0,16); this.value=v.replace(/(.{4})/g,'$1 ').trim(); }); }
+  var expInput=document.querySelector('#checkoutBody .field-row input');
+  if(expInput){ expInput.addEventListener('input',function(){ var v=this.value.replace(/\D/g,'').slice(0,4); this.value=v.length>2? v.slice(0,2)+' / '+v.slice(2):v; }); }
+
+  // payment methods
+  document.getElementById('payMethods').addEventListener('click',function(e){
+    var b=e.target.closest('.pm'); if(!b) return; var pm=b.getAttribute('data-pm'), isCard=pm==='card';
+    document.querySelectorAll('#payMethods .pm').forEach(function(x){ x.classList.toggle('sel', x===b); });
+    document.getElementById('cardFields').hidden=!isCard;
+    var alt=document.getElementById('altPay'); alt.hidden=isCard;
+    if(!isCard){ document.getElementById('altPayName').textContent={paypal:'PayPal',bizum:'Bizum',gpay:'Google Pay'}[pm]; }
+  });
+
+  // pricing / checkout
+  var PLANS={ starter:{name:"Starter",monthly:9.99,leads:"100 leads nuevos / mes"}, pro:{name:"Pro",monthly:14.99,leads:"500 leads nuevos / mes"}, elite:{name:"Élite",monthly:19.99,leads:"Leads ilimitados"} };
+  var annual=false, currentPlan='pro';
+  function eur(n){ return n.toFixed(2).replace('.',',')+'€'; }
+  var bswitch=document.getElementById('billingSwitch'), lblM=document.getElementById('lbl-monthly'), lblA=document.getElementById('lbl-annual');
+  function refreshCards(){ document.querySelectorAll('.plan').forEach(function(card){ var p=PLANS[card.getAttribute('data-plan')], amt=card.querySelector('.amt'), per=card.querySelector('.per'), sub=card.querySelector('.subprice'); if(annual){ var yr=p.monthly*10; amt.textContent=eur(yr); per.textContent=' /año'; sub.textContent='≈ '+eur(yr/12)+'/mes · ahorras '+eur(p.monthly*2); } else { amt.textContent=eur(p.monthly); per.textContent=' /mes'; sub.textContent=''; } }); }
+  function toggleBilling(){ annual=!annual; bswitch.classList.toggle('annual',annual); bswitch.setAttribute('aria-checked',annual); lblM.classList.toggle('on',!annual); lblA.classList.toggle('on',annual); refreshCards(); if(overlay.classList.contains('open')) fillCheckout(); }
+  bswitch.addEventListener('click',toggleBilling);
+  bswitch.addEventListener('keydown',function(e){ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); toggleBilling(); } });
+  refreshCards();
+
+  var overlay=document.getElementById('overlay'), checkoutBody=document.getElementById('checkoutBody'), coSuccess=document.getElementById('coSuccess');
+  function fillCheckout(){ var p=PLANS[currentPlan], base=annual?p.monthly*10:p.monthly, tax=base*0.21, total=base*1.21;
+    document.getElementById('sumPlanName').textContent='Plan '+p.name;
+    document.getElementById('sumPlanPrice').textContent=eur(base)+(annual?'/año':'/mes');
+    document.getElementById('sumLeads').textContent=p.leads;
+    document.getElementById('sumCycle').textContent=annual?'Anual':'Mensual';
+    document.getElementById('sumTax').textContent=eur(tax);
+    document.getElementById('sumTotal').textContent=eur(total);
+    document.getElementById('payAmount').textContent=eur(total);
+    document.querySelectorAll('#planPick button').forEach(function(b){ b.classList.toggle('sel', b.getAttribute('data-pick')===currentPlan); });
+  }
+  function openModal(plan){ currentPlan=plan||'pro'; coSuccess.classList.remove('show'); checkoutBody.style.display=''; fillCheckout(); overlay.classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeModal(){ overlay.classList.remove('open'); document.body.style.overflow=''; }
+  document.querySelectorAll('[data-open-plan]').forEach(function(b){ b.addEventListener('click',function(){ openModal(b.getAttribute('data-open-plan')); }); });
+  document.getElementById('modalClose').addEventListener('click',closeModal);
+  overlay.addEventListener('click',function(e){ if(e.target===overlay) closeModal(); });
+  document.getElementById('planPick').addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b) return; currentPlan=b.getAttribute('data-pick'); fillCheckout(); });
+  document.getElementById('payBtn').addEventListener('click',function(){
+    var p=PLANS[currentPlan]; activePlan=currentPlan;
+    var email=((document.querySelector('#checkoutBody input[type=email]')||{}).value||'').trim();
+    var nm=(email.split('@')[0]||'Juan'); nm=nm.charAt(0).toUpperCase()+nm.slice(1);
+    if(!loggedIn) login(nm);
+    checkoutBody.style.display='none';
+    document.getElementById('successMsg').textContent='Tu plan '+p.name+' está activo. Cada vez que entres irás directo a tu panel con leads nuevos.';
+    coSuccess.classList.add('show'); setPlanBadge(p.name);
+  });
+  document.getElementById('successGo').addEventListener('click',function(){ closeModal(); openGate(activePlan||currentPlan); });
+
+  // login
+  var loginOverlay=document.getElementById('loginOverlay'), nameField=document.getElementById('nameField'), loginMode='login';
+  function openLogin(){ loginOverlay.classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeLogin(){ loginOverlay.classList.remove('open'); document.body.style.overflow=''; }
+  document.getElementById('loginBtn').addEventListener('click',openLogin);
+  document.getElementById('loginClose').addEventListener('click',closeLogin);
+  loginOverlay.addEventListener('click',function(e){ if(e.target===loginOverlay) closeLogin(); });
+  document.querySelectorAll('.login-tabs .lt').forEach(function(t){ t.addEventListener('click',function(){ loginMode=t.getAttribute('data-lt'); document.querySelectorAll('.login-tabs .lt').forEach(function(x){ x.classList.toggle('sel',x===t); }); nameField.hidden=(loginMode!=='signup'); document.getElementById('loginSubmit').textContent=(loginMode==='signup'?'Crear cuenta':'Entrar'); }); });
+  document.querySelector('.oauth-btn').addEventListener('click',function(){ closeLogin(); login('Juan'); });
+
+  var userPlan='Prueba gratis';
+  function setPlanBadge(planName){ userPlan=planName; document.getElementById('ucPlan').textContent='Plan '+planName; document.getElementById('chipPlan').textContent='PLAN '+planName.toUpperCase(); }
+  function login(name){
+    loggedIn=true; currentUserName=name;
+    var initial=(name||'U').trim().charAt(0).toUpperCase()||'U';
+    document.getElementById('loginBtn').style.display='none';
+    var chip=document.getElementById('userChip'); chip.classList.add('show');
+    document.getElementById('chipAv').textContent=initial; document.getElementById('chipName').textContent=name;
+    document.getElementById('chipPlan').textContent='PLAN '+userPlan.toUpperCase();
+    var uc=document.getElementById('sideUser'); uc.classList.add('on');
+    document.getElementById('ucAv').textContent=initial; document.getElementById('ucName').textContent=name; document.getElementById('ucPlan').textContent='Plan '+userPlan;
+    chip.onclick=function(){ var sp=null; try{ sp=localStorage.getItem('lh_plan'); }catch(e){} if(sp&&PLANS[sp]) enterApp(sp); else toast('Aún no tienes plan activo','👤'); };
+  }
+  function enterApp(planKey){
+    activePlan=(planKey&&PLANS[planKey])?planKey:(activePlan||'pro'); appMode=true;
+    if(!loggedIn) login(currentUserName||'Juan');
+    try{ localStorage.setItem('lh_plan',activePlan); localStorage.setItem('lh_name',currentUserName||'Juan'); }catch(e){}
+    var pretty=PLANS[activePlan].name;
+    document.getElementById('abPlan').textContent='PLAN '+pretty.toUpperCase();
+    document.getElementById('abQuota').textContent=QUOTA_LABEL[activePlan];
+    document.getElementById('abAv').textContent=(currentUserName||'J').charAt(0).toUpperCase();
+    document.getElementById('csAvail').textContent=QUOTA_NUM[activePlan];
+    var lim=PLAN_CITIES[activePlan];
+    var setA=function(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; };
+    setA('ajPlan', pretty); setA('ajQuota', QUOTA_LABEL[activePlan]); setA('ajProv', lim===Infinity?'Toda España':lim);
+    setPlanBadge(pretty);
+    if(!citiesUsed.size) citiesUsed=new Set([currentCity]);
+    document.body.classList.add('app-mode');
+    document.querySelector('.side-item[data-view="explorar"]').click();
+    renderCity(currentCity); refreshViews(); window.scrollTo(0,0);
+  }
+  var gateOverlay=document.getElementById('gateOverlay');
+  function showGateStep(id){ ['gsVerify','gsOk','gsCity'].forEach(function(s){ document.getElementById(s).hidden=(s!==id); }); }
+  function openGate(plan){
+    activePlan=(plan&&PLANS[plan])?plan:(activePlan||'pro');
+    document.getElementById('gatePlan').textContent='PLAN '+PLANS[activePlan].name.toUpperCase()+' · ACTIVO';
+    var lim=PLAN_CITIES[activePlan];
+    document.getElementById('gateCityHint').textContent = (lim===Infinity)
+      ? 'Tu plan Élite te da acceso a toda España sin límites.'
+      : 'Tu plan te da acceso a '+lim+' '+(lim===1?'provincia':'provincias')+'.';
+    showGateStep('gsVerify');
+    gateOverlay.classList.add('open'); document.body.style.overflow='hidden';
+    setTimeout(function(){ showGateStep('gsOk'); }, 1500);
+  }
+  document.getElementById('gateContinue').addEventListener('click',function(){ showGateStep('gsCity'); setTimeout(function(){ document.getElementById('gateCity').focus(); },50); });
+  document.getElementById('gateEnter').addEventListener('click',function(){
+    var v=(document.getElementById('gateCity').value||'').trim(), keys=Object.keys(CITY_COORDS);
+    var match=keys.find(function(c){return c.toLowerCase()===v.toLowerCase();})||keys.find(function(c){return c.toLowerCase().indexOf(v.toLowerCase())===0;});
+    var city=match||'Madrid';
+    citiesUsed=new Set([city]); currentCity=city;
+    try{ localStorage.setItem('lh_city',city); }catch(e){}
+    gateOverlay.classList.remove('open'); document.body.style.overflow='';
+    enterApp(activePlan);
+    toast('¡Bienvenido a tu panel! Radar en '+city,'🎯');
+  });
+  function exitApp(){
+    appMode=false; loggedIn=false; activePlan=null; currentUserName='';
+    document.body.classList.remove('app-mode');
+    try{ localStorage.removeItem('lh_plan'); localStorage.removeItem('lh_name'); }catch(e){}
+    document.getElementById('loginBtn').style.display='';
+    document.getElementById('userChip').classList.remove('show');
+    document.getElementById('sideUser').classList.remove('on');
+    document.getElementById('ucName').textContent='Invitado'; document.getElementById('ucPlan').textContent='Inicia sesión'; document.getElementById('ucAv').textContent='?';
+    applyFilters(); refreshViews(); window.scrollTo(0,0); toast('Sesión cerrada','👋');
+  }
+  document.getElementById('btnLogout').addEventListener('click',exitApp);
+  document.getElementById('loginSubmit').addEventListener('click',function(){
+    var email=(document.getElementById('liEmail').value||'').trim();
+    var name=(loginMode==='signup' ? (document.getElementById('suName').value||'').trim() : '') || (email.split('@')[0]||'Usuario');
+    name=name.charAt(0).toUpperCase()+name.slice(1);
+    closeLogin(); login(name);
+    var sp=null,cy=null; try{ sp=localStorage.getItem('lh_plan'); cy=localStorage.getItem('lh_city'); }catch(e){}
+    if(sp&&PLANS[sp]){ activePlan=sp; if(cy&&CITY_COORDS[cy]){ currentCity=cy; citiesUsed=new Set([cy]); } enterApp(sp); }
+    else { toast('¡Hola '+name+'! Elige un plan para entrar a tu panel','🎯'); document.getElementById('precios').scrollIntoView({behavior:'smooth'}); }
+  });
+
+  // soporte
+  var supportOverlay=document.getElementById('supportOverlay');
+  function openSupport(){ supportOverlay.classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeSupport(){ supportOverlay.classList.remove('open'); document.body.style.overflow=''; }
+  document.getElementById('navSupport').addEventListener('click',function(e){ e.preventDefault(); openSupport(); });
+  var nS2=document.getElementById('navSupport2'); if(nS2){ nS2.addEventListener('click',function(e){ e.preventDefault(); openSupport(); }); }
+  document.getElementById('btnSupport').addEventListener('click',openSupport);
+  document.getElementById('supportClose').addEventListener('click',closeSupport);
+  supportOverlay.addEventListener('click',function(e){ if(e.target===supportOverlay) closeSupport(); });
+  document.getElementById('supWa').addEventListener('click',function(){ window.open('https://wa.me/34600000000?text='+encodeURIComponent('Hola, necesito ayuda con LeadHunter'),'_blank'); });
+  document.getElementById('supMail').addEventListener('click',function(){ window.open('mailto:widyagency.info@gmail.com?subject=Soporte%20LeadHunter','_blank'); });
+  document.getElementById('supChat').addEventListener('click',function(){ toast('Abriendo chat en vivo… (demo)','💬'); });
+
+  // FABs
+  document.getElementById('fabHunt').addEventListener('click',function(){ document.getElementById('app').scrollIntoView({behavior:'smooth'}); });
+  document.getElementById('fabWa').addEventListener('click',function(){ window.open('https://wa.me/34600000000?text='+encodeURIComponent('Hola, tengo una duda sobre LeadHunter'),'_blank'); toast('Abriendo soporte por WhatsApp…','💬'); });
+
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ if(overlay.classList.contains('open')) closeModal(); if(loginOverlay.classList.contains('open')) closeLogin(); if(supportOverlay.classList.contains('open')) closeSupport(); } });
+
+  // reveal + counters
+  var io=new IntersectionObserver(function(en){ en.forEach(function(x){ if(x.isIntersecting){ x.target.classList.add('in'); io.unobserve(x.target); } }); },{threshold:.15});
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+  function animateCount(el){ var target=parseInt(el.getAttribute('data-count'),10), suffix=el.getAttribute('data-suffix')||'', start=null, dur=1400; function step(ts){ if(!start) start=ts; var p=Math.min((ts-start)/dur,1), val=Math.floor((1-Math.pow(1-p,3))*target); el.textContent=val.toLocaleString('es-ES')+suffix; if(p<1) requestAnimationFrame(step); } requestAnimationFrame(step); }
+  var cio=new IntersectionObserver(function(en){ en.forEach(function(x){ if(x.isIntersecting){ animateCount(x.target); cio.unobserve(x.target); } }); },{threshold:.5});
+  document.querySelectorAll('[data-count]').forEach(function(el){ cio.observe(el); });
+
+  // init
+  renderMapLights();
+  renderCity('Málaga');
+  refreshViews();
+  // auto-login: si ya pagaste, entras directo a tu panel
+  (function autoLogin(){ var sp=null,nm=null,cy=null; try{ sp=localStorage.getItem('lh_plan'); nm=localStorage.getItem('lh_name'); cy=localStorage.getItem('lh_city'); }catch(e){} if(sp&&PLANS[sp]){ login(nm||'Juan'); activePlan=sp; if(cy&&CITY_COORDS[cy]){ currentCity=cy; citiesUsed=new Set([cy]); } enterApp(sp); } })();
+})();
+</script>

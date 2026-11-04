@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="26 16 52 82">
+  <defs>
+    <linearGradient id="logoGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2f56ff"/>
+      <stop offset="1" stop-color="#7b2ff7"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#logoGrad)" d="M34,56 L43,61 L43,72 Q43,74.5 40.5,74.5 L36.5,74.5 Q34,74.5 34,72 Z"/>
+  <path fill="url(#logoGrad)" d="M47,23 L57,31 L57,69 Q57,71.5 54.5,71.5 L50,71.5 Q47,71.5 47,69 Z"/>
+  <path fill="url(#logoGrad)" d="M61,41 L70,48 L70,64 Q70,66.5 67.5,66.5 L63.5,66.5 Q61,66.5 61,64 Z"/>
+  <path fill="none" stroke="url(#logoGrad)" stroke-width="2.4" stroke-linecap="round" d="M38.5,74.5 L38.5,84 M52,71.5 L52,86 M65.5,66.5 L65.5,84"/>
+  <circle fill="none" stroke="url(#logoGrad)" stroke-width="2.4" cx="38.5" cy="87.5" r="3.3"/>
+  <circle fill="none" stroke="url(#logoGrad)" stroke-width="2.4" cx="52" cy="89.5" r="3.3"/>
+  <circle fill="none" stroke="url(#logoGrad)" stroke-width="2.4" cx="65.5" cy="87.5" r="3.3"/>
+</svg>

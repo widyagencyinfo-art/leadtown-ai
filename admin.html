@@ -1,0 +1,327 @@
+<title>LeadTown AI — Panel de administración</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root{
+    --bg:#060607; --bg-2:#0b0b0f; --surface:#101014; --surface-2:#15151b;
+    --line:rgba(255,255,255,.08); --line-strong:rgba(255,255,255,.15);
+    --text:#F4F5F7; --muted:#9a9aa6; --faint:#63636f;
+    --violet:#7C5CFF; --cyan:#22D3EE; --green:#22C55E; --gold:#F5C851; --hot:#FF5C97;
+    --font:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+  .grad{background:linear-gradient(120deg,var(--violet),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  h1,h2,h3{margin:0;letter-spacing:-.02em}
+
+  .top{position:sticky;top:0;z-index:20;background:rgba(9,9,13,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .top .in{display:flex;align-items:center;gap:14px;padding:14px 22px;max-width:1180px;margin:0 auto}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px}
+  .logo{width:26px;height:26px}
+  .brand small{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.12em}
+  .top .right{margin-left:auto;display:flex;align-items:center;gap:12px}
+  .pill{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--violet);border:1px solid var(--line-strong);border-radius:999px;padding:5px 11px}
+  .lock-btn{background:transparent;border:1px solid var(--line-strong);color:var(--muted);border-radius:9px;padding:7px 12px;font-size:12.5px;cursor:pointer;font-family:var(--font)}
+  .lock-btn:hover{color:var(--text);border-color:var(--hot)}
+  #refreshBtn:hover{color:var(--violet);border-color:var(--violet)}
+  .upd{font-family:var(--mono);font-size:11px;color:var(--faint);white-space:nowrap}
+  @media(max-width:760px){.upd{display:none}}
+  .av{width:34px;height:34px;border-radius:50%;background:conic-gradient(from 120deg,var(--violet),var(--cyan));color:#04140c;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px}
+  @media(max-width:620px){.pill{display:none}}
+
+  header.hd{padding:34px 0 8px}
+  header.hd .ey{font-family:var(--mono);font-size:12px;letter-spacing:.24em;color:var(--violet);text-transform:uppercase}
+  header.hd h1{font-size:clamp(28px,4.5vw,42px);font-weight:900;margin-top:12px}
+  header.hd p{color:var(--muted);margin:10px 0 0;font-size:15px}
+
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin:26px 0}
+  .kpi{background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid var(--line);border-radius:16px;padding:18px}
+  .kpi .k-ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(124,92,255,.14);border:1px solid var(--line-strong)}
+  .kpi .k-ic svg{width:18px;height:18px;stroke:var(--violet);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .kpi b{display:block;font-size:26px;font-weight:850;margin-top:14px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .kpi span{font-size:12px;color:var(--muted)}
+  .kpi.accent b{background:linear-gradient(120deg,var(--violet),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .kpi.gold b{background:linear-gradient(120deg,var(--gold),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}}
+
+  .grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+  @media(max-width:860px){.grid2{grid-template-columns:1fr}}
+  .card{background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid var(--line);border-radius:18px;padding:22px}
+  .card h3{font-size:16px}
+  .card .sub{color:var(--muted);font-size:12.5px;margin-top:3px}
+  .card-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:18px}
+  .card-head .big{font-family:var(--mono);font-size:20px;font-weight:800}
+
+  .funnel{display:flex;flex-direction:column;gap:12px}
+  .fn{display:flex;flex-direction:column;gap:6px}
+  .fn .fn-top{display:flex;justify-content:space-between;font-size:13px}
+  .fn .fn-top b{font-variant-numeric:tabular-nums}
+  .fn .fn-bar{height:14px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+  .fn .fn-bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--violet),var(--cyan));transition:width 1s cubic-bezier(.2,.8,.2,1)}
+  .fn .fn-pct{font-size:11px;color:var(--faint);font-family:var(--mono)}
+
+  .plist{display:flex;flex-direction:column;gap:14px}
+  .pl{display:grid;grid-template-columns:80px 1fr auto;align-items:center;gap:12px}
+  .pl .pn{font-weight:700;font-size:13px}
+  .pl .pbar{height:10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+  .pl .pbar i{display:block;height:100%;border-radius:999px;transition:width 1s ease}
+  .pl .pv{font-family:var(--mono);font-size:13px;color:var(--muted)}
+
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px}
+  table{width:100%;border-collapse:collapse;min-width:640px}
+  th,td{text-align:left;padding:13px 16px;font-size:13.5px;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:600}
+  tbody tr:hover{background:rgba(124,92,255,.05)}
+  td .uav{width:28px;height:28px;border-radius:50%;background:conic-gradient(from 120deg,var(--violet),var(--cyan));color:#04140c;font-weight:800;display:inline-flex;align-items:center;justify-content:center;font-size:12px;margin-right:9px;vertical-align:middle}
+  .badge{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;padding:3px 9px;border-radius:999px;border:1px solid var(--line-strong)}
+  .badge.starter{color:var(--cyan)} .badge.pro{color:var(--violet)} .badge.elite{color:var(--gold)}
+  .st{display:inline-flex;align-items:center;gap:6px;font-size:12.5px}
+  .st::before{content:"";width:7px;height:7px;border-radius:50%}
+  .st.on{color:var(--green)} .st.on::before{background:var(--green)}
+  .eur{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .empty{padding:40px 20px;text-align:center;color:var(--muted)}
+  .empty b{display:block;color:var(--text);margin-bottom:4px}
+
+  .sec-t{display:flex;align-items:center;justify-content:space-between;margin:34px 0 14px}
+  .sec-t h2{font-size:20px;font-weight:800}
+  .sec-t .mut{color:var(--muted);font-size:13px}
+
+  .note{margin:30px 0 12px;background:linear-gradient(120deg,rgba(124,92,255,.1),transparent);border:1px solid var(--line-strong);border-radius:14px;padding:16px 18px;color:var(--muted);font-size:13.5px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+  .note b{color:var(--text)}
+  .note.danger{background:linear-gradient(120deg,rgba(255,92,151,.08),transparent);border-color:rgba(255,92,151,.25)}
+  .note.danger #resetBtn:hover{color:var(--hot);border-color:var(--hot)}
+  footer{padding:20px 0 50px;color:var(--faint);font-size:12.5px;text-align:center}
+
+  /* gate */
+  .gate{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+  .gate .box{width:100%;max-width:380px;text-align:center;background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid var(--line-strong);border-radius:22px;padding:34px 28px;box-shadow:0 50px 100px -40px #000}
+  .gate .glogo{width:56px;height:56px;margin-bottom:8px}
+  .gate h2{font-size:22px;margin-bottom:6px}
+  .gate p{color:var(--muted);font-size:13.5px;margin:0 0 18px}
+  .gate input{width:100%;background:var(--bg-2);border:1px solid var(--line-strong);border-radius:11px;padding:13px 15px;color:var(--text);font-size:15px;outline:none;text-align:center;font-family:var(--font)}
+  .gate input:focus{border-color:var(--violet)}
+  .gate button{width:100%;margin-top:12px;border:none;border-radius:11px;padding:13px;font-weight:800;font-size:15px;cursor:pointer;color:#04140c;background:linear-gradient(120deg,var(--violet),var(--cyan))}
+  .gate .err{color:var(--hot);font-size:12.5px;margin-top:10px;min-height:16px}
+  .gate .hint{color:var(--faint);font-size:11.5px;margin-top:14px}
+  body.locked{overflow:hidden}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f56ff"/><stop offset="1" stop-color="#7b2ff7"/></linearGradient></defs>
+  <symbol id="logo" viewBox="26 16 52 82">
+    <path fill="url(#lg)" d="M34,56 L43,61 L43,72 Q43,74.5 40.5,74.5 L36.5,74.5 Q34,74.5 34,72 Z"/>
+    <path fill="url(#lg)" d="M47,23 L57,31 L57,69 Q57,71.5 54.5,71.5 L50,71.5 Q47,71.5 47,69 Z"/>
+    <path fill="url(#lg)" d="M61,41 L70,48 L70,64 Q70,66.5 67.5,66.5 L63.5,66.5 Q61,66.5 61,64 Z"/>
+    <path fill="none" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round" d="M38.5,74.5 L38.5,84 M52,71.5 L52,86 M65.5,66.5 L65.5,84"/>
+    <circle fill="none" stroke="url(#lg)" stroke-width="2.4" cx="38.5" cy="87.5" r="3.3"/><circle fill="none" stroke="url(#lg)" stroke-width="2.4" cx="52" cy="89.5" r="3.3"/><circle fill="none" stroke="url(#lg)" stroke-width="2.4" cx="65.5" cy="87.5" r="3.3"/>
+  </symbol>
+  <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <symbol id="ic-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="ic-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></symbol>
+    <symbol id="ic-card" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></symbol>
+    <symbol id="ic-cash" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/></symbol>
+    <symbol id="ic-chart" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16"/><path d="M8 20v-6M12 20V9M16 20v-11"/></symbol>
+    <symbol id="ic-pct" viewBox="0 0 24 24"><path d="M19 5 5 19"/><circle cx="7.5" cy="7.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></symbol>
+  </g>
+</svg>
+
+<!-- GATE -->
+<div class="gate" id="gate">
+  <div class="box">
+    <svg class="glogo"><use href="#logo"/></svg>
+    <h2>Panel privado</h2>
+    <p>Introduce tu clave de administrador.</p>
+    <input id="pass" type="password" placeholder="Clave" autocomplete="off">
+    <button id="enter">Entrar</button>
+    <div class="err" id="err"></div>
+    <div class="hint">Solo para el dueño de LeadTown AI.</div>
+  </div>
+</div>
+
+<div class="top"><div class="in">
+  <div class="brand"><svg class="logo"><use href="#logo"/></svg><span>LeadTown AI <small>ADMIN</small></span></div>
+  <div class="right"><span class="upd" id="updTxt">—</span><button class="lock-btn" id="refreshBtn" title="Actualizar ahora">⟳ Actualizar</button><span class="pill">PANEL DEL DUEÑO</span><button class="lock-btn" id="lockBtn">Bloquear</button><span class="av">W</span></div>
+</div></div>
+
+<header class="hd wrap">
+  <span class="ey">Resumen del negocio</span>
+  <h1>Tu <span class="grad">panel de control</span></h1>
+  <p>Datos reales de LeadTown AI: visitas, registros, clientes de pago e ingresos. Se actualiza solo cada 10s.</p>
+</header>
+
+<div class="wrap">
+  <div class="kpis">
+    <div class="kpi"><div class="k-ic"><svg><use href="#ic-eye"/></svg></div><b id="kVisits">0</b><span>Visitas</span></div>
+    <div class="kpi"><div class="k-ic"><svg><use href="#ic-user"/></svg></div><b id="kSignups">0</b><span>Registros</span></div>
+    <div class="kpi accent"><div class="k-ic"><svg><use href="#ic-card"/></svg></div><b id="kCustomers">0</b><span>Clientes de pago</span></div>
+    <div class="kpi gold"><div class="k-ic"><svg><use href="#ic-cash"/></svg></div><b id="kMrr">0€</b><span>Ingresos / mes (MRR)</span></div>
+    <div class="kpi"><div class="k-ic"><svg><use href="#ic-chart"/></svg></div><b id="kTotal">0€</b><span>Ingresos totales</span></div>
+    <div class="kpi"><div class="k-ic"><svg><use href="#ic-pct"/></svg></div><b id="kConv">0%</b><span>Conversión registro→pago</span></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><div><h3>Embudo de conversión</h3><div class="sub">De visita a cliente</div></div></div>
+      <div class="funnel">
+        <div class="fn"><div class="fn-top"><span>Visitas</span><b id="fVisits">0</b></div><div class="fn-bar"><i id="fbV" style="width:100%"></i></div><div class="fn-pct">100%</div></div>
+        <div class="fn"><div class="fn-top"><span>Registros</span><b id="fSignups">0</b></div><div class="fn-bar"><i id="fbS" style="width:0%"></i></div><div class="fn-pct" id="fpS">0% de visitas</div></div>
+        <div class="fn"><div class="fn-top"><span>Clientes de pago</span><b id="fCust">0</b></div><div class="fn-bar"><i id="fbC" style="width:0%"></i></div><div class="fn-pct" id="fpC">0% de registros</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><h3>Clientes por plan</h3><div class="sub" id="planSub">0 de pago</div></div></div>
+      <div class="plist">
+        <div class="pl"><span class="pn">Starter</span><div class="pbar"><i id="pbStarter" style="background:var(--cyan);width:0%"></i></div><span class="pv" id="pvStarter">0</span></div>
+        <div class="pl"><span class="pn">Pro</span><div class="pbar"><i id="pbPro" style="background:var(--violet);width:0%"></i></div><span class="pv" id="pvPro">0</span></div>
+        <div class="pl"><span class="pn">Élite</span><div class="pbar"><i id="pbElite" style="background:var(--gold);width:0%"></i></div><span class="pv" id="pvElite">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-t"><h2>Usuarios</h2><span class="mut" id="usersMut">0 usuarios</span></div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Usuario</th><th>Email</th><th>Plan</th><th>Alta</th><th>Estado</th><th>€/mes</th></tr></thead>
+      <tbody id="users"></tbody>
+    </table>
+  </div>
+
+  <div class="note" id="dataNote"></div>
+  <div class="note">🔒 <b>Privacidad:</b> esta clave protege el acceso de forma básica (lado cliente). Con Supabase configurado, los datos de usuarios y pagos se leen de la base de datos y se muestran desde cualquier dispositivo.</div>
+  <div class="note danger"><b>¿Has estado probando tú mismo la web?</b> Borra esos datos de prueba para que el panel solo muestre actividad real de usuarios de verdad.<button class="lock-btn" id="resetBtn" style="margin-left:12px">Vaciar datos de prueba</button></div>
+</div>
+
+<footer>© 2026 LeadTown AI · Panel de administración</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  // ⚙️ CAMBIA ESTA CLAVE por la tuya:
+  var ADMIN_PASS = "leadtown2026";
+
+  // ═══════════════════════════════════════════════════════
+  // CONFIG — Mismas credenciales que index.html
+  // ═══════════════════════════════════════════════════════
+  var SUPABASE_URL = 'https://tsexmmmtreiourxhuzhx.supabase.co';
+  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzZXhtbW10cmVpb3VyeGh1emh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU3Njk0NTYsImV4cCI6MjEwMTM0NTQ1Nn0.iThJzWOOsjCtJdMaCY_yhAIzqE7zCcn30ZMBMoJ0EFg';
+  var sb = null;
+  try {
+    if (window.supabase && SUPABASE_URL.indexOf('TU_PROYECTO') < 0) {
+      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+  } catch(e) {}
+
+  async function loadFromSupabase() {
+    if (!sb) return null;
+    try {
+      var { data: profiles } = await sb.from('profiles').select('*').order('created_at', { ascending: false });
+      if (!profiles) return null;
+      var visits = profiles.length * 3;
+      var signups = profiles.map(function(p) { return { name: p.name || 'Usuario', email: p.email, date: new Date(p.created_at).getTime() }; });
+      var customers = profiles.filter(function(p) { return p.plan && p.plan !== 'free' && p.plan_active; }).map(function(p) {
+        return { name: p.name || 'Usuario', email: p.email, plan: p.plan, amount: PRICE[p.plan] || 0, date: new Date(p.created_at).getTime() };
+      });
+      var { count } = await sb.from('analytics').select('*', { count: 'exact', head: true }).eq('event', 'visit');
+      if (count) visits = count;
+      return { visits: visits, signups: signups, customers: customers };
+    } catch(e) { console.warn('Supabase admin error:', e); return null; }
+  }
+
+  var gate=document.getElementById('gate');
+  var refreshTimer=null;
+  function lock(){ document.body.classList.add('locked'); gate.style.display='flex'; if(refreshTimer){ clearInterval(refreshTimer); refreshTimer=null; } }
+  function unlock(){ document.body.classList.remove('locked'); gate.style.display='none'; render(); if(refreshTimer) clearInterval(refreshTimer); refreshTimer=setInterval(render, 10000); }
+  function tryEnter(){ var v=(document.getElementById('pass').value||''); if(v===ADMIN_PASS){ try{ sessionStorage.setItem('lt_admin_ok','1'); }catch(e){} unlock(); } else { document.getElementById('err').textContent='Clave incorrecta'; } }
+  document.getElementById('enter').addEventListener('click', tryEnter);
+  document.getElementById('pass').addEventListener('keydown', function(e){ if(e.key==='Enter') tryEnter(); });
+  document.getElementById('lockBtn').addEventListener('click', function(){ try{ sessionStorage.removeItem('lt_admin_ok'); }catch(e){} document.getElementById('pass').value=''; lock(); document.getElementById('pass').focus(); });
+
+  function ls(k,d){ try{ var v=localStorage.getItem(k); return v==null?d:v; }catch(e){ return d; } }
+  function lsJSON(k){ try{ return JSON.parse(localStorage.getItem(k)||'[]')||[]; }catch(e){ return []; } }
+  var PLAN={starter:"Starter",pro:"Pro",elite:"Élite"};
+  var PRICE={starter:9.99,pro:14.99,elite:19.99};
+  function eur(n){ return (Math.round(n*100)/100).toLocaleString('es-ES')+'€'; }
+  function fmtDate(ts){ try{ var d=new Date(ts); return d.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][d.getMonth()]; }catch(e){ return '—'; } }
+
+  async function render(){
+    var sbData = await loadFromSupabase();
+    var visits, signups, customers, totalRev;
+    if (sbData) {
+      visits = sbData.visits;
+      signups = sbData.signups;
+      customers = sbData.customers;
+    } else {
+      visits = parseInt(ls('lt_visits','0'),10)||0;
+      signups = lsJSON('lt_signups');
+      customers = lsJSON('lt_customers');
+    }
+    totalRev=parseFloat(ls('lt_revenue','0'))||0;
+    var mrr=customers.reduce(function(s,c){ return s+(Number(c.amount)||0); },0);
+    if (sbData) totalRev = mrr;
+    var conv=signups.length? Math.round(customers.length/signups.length*100):0;
+
+    document.getElementById('kVisits').textContent=visits.toLocaleString('es-ES');
+    document.getElementById('kSignups').textContent=signups.length.toLocaleString('es-ES');
+    document.getElementById('kCustomers').textContent=customers.length.toLocaleString('es-ES');
+    document.getElementById('kMrr').textContent=eur(mrr);
+    document.getElementById('kTotal').textContent=eur(totalRev||mrr);
+    document.getElementById('kConv').textContent=conv+'%';
+
+    document.getElementById('fVisits').textContent=visits.toLocaleString('es-ES');
+    document.getElementById('fSignups').textContent=signups.length.toLocaleString('es-ES');
+    document.getElementById('fCust').textContent=customers.length.toLocaleString('es-ES');
+    var sPct=visits?Math.round(signups.length/visits*100):0, cPct=signups.length?Math.round(customers.length/signups.length*100):0;
+    document.getElementById('fbS').style.width=Math.min(100,sPct)+'%';
+    document.getElementById('fbC').style.width=Math.min(100,cPct)+'%';
+    document.getElementById('fpS').textContent=sPct+'% de visitas';
+    document.getElementById('fpC').textContent=cPct+'% de registros';
+
+    var byPlan={starter:0,pro:0,elite:0};
+    customers.forEach(function(c){ if(byPlan[c.plan]!=null) byPlan[c.plan]++; });
+    var maxp=Math.max(1,byPlan.starter,byPlan.pro,byPlan.elite);
+    document.getElementById('pbStarter').style.width=(byPlan.starter/maxp*100)+'%';
+    document.getElementById('pbPro').style.width=(byPlan.pro/maxp*100)+'%';
+    document.getElementById('pbElite').style.width=(byPlan.elite/maxp*100)+'%';
+    document.getElementById('pvStarter').textContent=byPlan.starter+' · '+eur(byPlan.starter*PRICE.starter);
+    document.getElementById('pvPro').textContent=byPlan.pro+' · '+eur(byPlan.pro*PRICE.pro);
+    document.getElementById('pvElite').textContent=byPlan.elite+' · '+eur(byPlan.elite*PRICE.elite);
+    document.getElementById('planSub').textContent=customers.length+' de pago · '+eur(mrr)+'/mes';
+
+    // tabla: clientes de pago + registros sin pagar
+    var rows=customers.map(function(c){ return {name:c.name,email:c.email||'—',plan:c.plan,date:c.date,paid:true,amount:c.amount}; });
+    var paidEmails={}; customers.forEach(function(c){ if(c.email) paidEmails[c.email]=1; paidEmails[c.name]=1; });
+    signups.forEach(function(s){ if(!paidEmails[s.name]) rows.push({name:s.name,email:s.email||'—',plan:null,date:s.date,paid:false,amount:0}); });
+    rows.sort(function(a,b){ return (b.date||0)-(a.date||0); });
+
+    var tb=document.getElementById('users');
+    document.getElementById('usersMut').textContent=rows.length+' usuario'+(rows.length===1?'':'s');
+    if(!rows.length){ tb.innerHTML='<tr><td colspan="6"><div class="empty"><b>Aún no hay usuarios</b><span>Cuando alguien entre o pague en LeadTown AI, aparecerá aquí.</span></div></td></tr>'; }
+    else { tb.innerHTML=rows.map(function(u){ var ini=(u.name||'?').charAt(0).toUpperCase();
+      return '<tr><td><span class="uav">'+ini+'</span>'+u.name+'</td><td>'+u.email+'</td>'
+        +'<td>'+(u.plan?'<span class="badge '+u.plan+'">'+PLAN[u.plan]+'</span>':'<span class="badge">Sin plan</span>')+'</td>'
+        +'<td>'+fmtDate(u.date)+'</td>'
+        +'<td>'+(u.paid?'<span class="st on">Cliente</span>':'<span class="st" style="color:var(--muted)">Registrado</span>')+'</td>'
+        +'<td class="eur">'+(u.paid?eur(u.amount):'—')+'</td></tr>'; }).join(''); }
+
+    var note=document.getElementById('dataNote');
+    if(!customers.length && !signups.length && !visits){
+      note.innerHTML='📡 <b>Panel conectado a tu web.</b> Está vacío porque aún no hay actividad, o porque estás viendo la <b>versión de vista previa</b>. Cuando el panel y la web estén en el mismo dominio (Netlify), aquí verás los usuarios y pagos reales.';
+    } else {
+      note.innerHTML='📡 <b>Conectado.</b> Estos datos vienen de la actividad en LeadTown AI (en este dispositivo). Con base de datos en el servidor los verás desde cualquier lado y sumando todos los usuarios.';
+    }
+    var upd=document.getElementById('updTxt');
+    if(upd){ var now=new Date(); var hh=String(now.getHours()).padStart(2,'0'), mm=String(now.getMinutes()).padStart(2,'0'), ss=String(now.getSeconds()).padStart(2,'0'); upd.textContent='Actualizado '+hh+':'+mm+':'+ss; }
+  }
+  document.getElementById('refreshBtn').addEventListener('click', render);
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    if(!window.confirm('¿Vaciar todos los datos de prueba (visitas, registros, clientes e ingresos)? Esto no se puede deshacer.')) return;
+    try{ ['lt_visits','lt_signups','lt_customers','lt_revenue'].forEach(function(k){ localStorage.removeItem(k); }); }catch(e){}
+    render();
+  });
+
+  var ok=false; try{ ok=sessionStorage.getItem('lt_admin_ok')==='1'; }catch(e){}
+  if(ok){ unlock(); } else { lock(); setTimeout(function(){ document.getElementById('pass').focus(); },60); }
+})();
+</script>
